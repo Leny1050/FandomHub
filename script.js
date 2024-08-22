@@ -116,7 +116,7 @@ async function addRule() {
         alert("Пожалуйста, войдите в систему с разрешенным адресом электронной почты для добавления правила.");
     }
 }
-
+document.getElementById('addRuleButton').addEventListener('click', addRule);
 async function deleteRule(id) {
     try {
         await deleteDoc(doc(db, "rules", id));
