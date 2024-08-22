@@ -1,17 +1,17 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Firebase конфигурация
 const firebaseConfig = {
-    apiKey: "AIzaSyDB8xtw8-AYLO7vwcnU3A4-tbGWdRibAJU",
-    authDomain: "flud-po-fandomam.firebaseapp.com",
-    projectId: "flud-po-fandomam",
-    storageBucket: "flud-po-fandomam.appspot.com",
-    messagingSenderId: "30961710313",
-    appId: "1:30961710313:web:4bc81ff6a1ff1b6f4dbf5d",
-    measurementId: "G-WH6ZXJMG15"
+    apiKey: "AIzaSyA8NY2vDCOd5ePK5fDMWaMd2JfsRrTabf4",
+    authDomain: "flud-73dba.firebaseapp.com",
+    projectId: "flud-73dba",
+    storageBucket: "flud-73dba.appspot.com",
+    messagingSenderId: "799414854266",
+    appId: "1:799414854266:web:97a0a54eeb9271389c11c3",
+    measurementId: "G-C2VRPHPDRG"
 };
 
 // Инициализация Firebase
@@ -20,158 +20,146 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 
-// Загрузка правил из Firestore
-async function loadRules() {
-    const rulesCollection = collection(db, "rules");
-    const rulesSnapshot = await getDocs(rulesCollection);
-    const rulesList = document.getElementById("rules");
-    rulesList.innerHTML = ""; // Очищаем список перед загрузкой новых данных
-    rulesSnapshot.forEach((doc) => {
-        const ruleItem = document.createElement("li");
-        ruleItem.className = "rule-item";
-        ruleItem.textContent = doc.data().text;
+// Элементы
+const loginButton = document.getElementById("loginButton");
+const logoutButton = document.getElementById("logoutButton");
+const addRuleButton = document.getElementById("addRuleButton");
+const addRuleContainer = document.getElementById("addRuleContainer");
+const rulesList = document.getElementById("rules");
+const imageUpload = document.getElementById("imageUpload");
+const uploadImageButton = document.getElementById("uploadImageButton");
+const approvedImages = document.getElementById("approvedImages");
+const pendingContainer = document.getElementById("pendingContainer");
+const pendingImages = document.getElementById("pendingImages");
 
-        // Добавление кнопки удаления только если пользователь авторизован
-        const user = auth.currentUser;
-        if (user) {
-            const deleteButton = document.createElement("button");
-            deleteButton.className = "delete-button";
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = async () => {
-                await deleteDoc(doc(db, "rules", doc.id));
-                loadRules(); // Перезагружаем правила после удаления
-            };
-            ruleItem.appendChild(deleteButton);
-        }
-
-        rulesList.appendChild(ruleItem);
-    });
-}
-
-// Добавление нового правила
-async function addRule(ruleText) {
-    const user = auth.currentUser;
-    if (user) {
-        await addDoc(collection(db, "rules"), {
-            text: ruleText,
-            user: user.uid
-        });
-        loadRules(); // Перезагружаем правила после добавления
-    }
-}
-
-// Обработка события добавления правила
-document.getElementById("addRuleButton").addEventListener("click", () => {
-    const newRuleInput = document.getElementById("new-rule");
-    const newRuleText = newRuleInput.value;
-    if (newRuleText) {
-        addRule(newRuleText);
-        newRuleInput.value = ""; // Очистка поля ввода после добавления
-    }
-});
-
-// Аутентификация через Google
-document.getElementById("loginButton").addEventListener("click", () => {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider);
-});
-
-// Выход из аккаунта
-document.getElementById("logoutButton").addEventListener("click", () => {
-    signOut(auth);
-});
-
-// Отслеживание состояния аутентификации
+// Обработка аутентификации
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        document.getElementById("loginButton").style.display = "none";
-        document.getElementById("logoutButton").style.display = "block";
-        document.getElementById("addRuleContainer").style.display = "block";
-        loadRules();
-        loadPendingImages();
+        loginButton.style.display = "none";
+        logoutButton.style.display = "inline-block";
+        addRuleContainer.style.display = "block";
+        pendingContainer.style.display = "block";
     } else {
-        document.getElementById("loginButton").style.display = "block";
-        document.getElementById("logoutButton").style.display = "none";
-        document.getElementById("addRuleContainer").style.display = "none";
+        loginButton.style.display = "inline-block";
+        logoutButton.style.display = "none";
+        addRuleContainer.style.display = "none";
+        pendingContainer.style.display = "none";
+    }
+});
+
+loginButton.addEventListener("click", async () => {
+    const email = prompt("Введите email");
+    const password = prompt("Введите пароль");
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+        alert("Ошибка входа: " + error.message);
+    }
+});
+
+logoutButton.addEventListener("click", async () => {
+    await signOut(auth);
+});
+
+// Добавление правила
+addRuleButton.addEventListener("click", async () => {
+    const newRule = document.getElementById("new-rule").value;
+    if (newRule.trim() === "") return;
+
+    try {
+        await addDoc(collection(db, "rules"), { text: newRule });
         loadRules();
+    } catch (error) {
+        console.error("Ошибка при добавлении правила: ", error);
     }
 });
 
-// Функция загрузки изображений
-async function uploadImage(file) {
-    const user = auth.currentUser;
-    if (user) {
-        const storageRef = ref(storage, `images/${file.name}`);
-        await uploadBytes(storageRef, file);
-        const downloadURL = await getDownloadURL(storageRef);
-        await addDoc(collection(db, "images"), {
-            url: downloadURL,
-            user: user.uid,
-            approved: false
+// Загрузка правил
+async function loadRules() {
+    rulesList.innerHTML = "";
+    const rulesSnapshot = await getDocs(collection(db, "rules"));
+    rulesSnapshot.forEach((doc) => {
+        const ruleItem = document.createElement("li");
+        ruleItem.classList.add("rule-item");
+        ruleItem.innerHTML = `
+            <p>${doc.data().text}</p>
+            <button class="delete-button" data-id="${doc.id}">Удалить</button>
+        `;
+        rulesList.appendChild(ruleItem);
+    });
+    attachDeleteHandlers();
+}
+
+// Обработка удаления правила
+function attachDeleteHandlers() {
+    const deleteButtons = document.querySelectorAll(".delete-button");
+    deleteButtons.forEach((button) => {
+        button.addEventListener("click", async (e) => {
+            const ruleId = e.target.dataset.id;
+            try {
+                await deleteDoc(doc(db, "rules", ruleId));
+                loadRules();
+            } catch (error) {
+                console.error("Ошибка при удалении правила: ", error);
+            }
         });
-        loadPendingImages(); // Обновление ожидающих изображений после загрузки
-    }
+    });
 }
 
-// Обработка события загрузки изображения
-document.getElementById("uploadImageButton").addEventListener("click", () => {
-    const fileInput = document.getElementById("imageUpload");
-    const file = fileInput.files[0];
-    if (file) {
-        uploadImage(file);
-        fileInput.value = ""; // Очистка поля ввода после загрузки
+// Загрузка изображения
+uploadImageButton.addEventListener("click", async () => {
+    const file = imageUpload.files[0];
+    if (!file) return;
+
+    const storageRef = ref(storage, `pending_images/${file.name}`);
+    try {
+        await uploadBytes(storageRef, file);
+        alert("Изображение загружено и ожидает проверки.");
+        loadPendingImages();
+    } catch (error) {
+        console.error("Ошибка при загрузке изображения: ", error);
     }
 });
 
-// Загрузка ожидающих изображений из Firestore
-async function loadPendingImages() {
-    const imagesCollection = collection(db, "images");
-    const imagesSnapshot = await getDocs(imagesCollection);
-    const pendingContainer = document.getElementById("pendingImages");
-    pendingContainer.innerHTML = ""; // Очищаем контейнер перед загрузкой новых данных
-    imagesSnapshot.forEach((doc) => {
-        if (!doc.data().approved) {
-            const imageElement = document.createElement("img");
-            imageElement.src = doc.data().url;
-            imageElement.alt = "Pending Image";
-            imageElement.classList.add("pending-image");
-
-            const approveButton = document.createElement("button");
-            approveButton.textContent = "Approve";
-            approveButton.onclick = async () => {
-                await updateDoc(doc.ref, {
-                    approved: true
-                });
-                loadPendingImages(); // Перезагружаем изображения после подтверждения
-                loadApprovedImages();
-            };
-
-            const pendingItem = document.createElement("div");
-            pendingItem.className = "pending-item";
-            pendingItem.appendChild(imageElement);
-            pendingItem.appendChild(approveButton);
-            pendingContainer.appendChild(pendingItem);
-        }
-    });
-}
-
-// Загрузка подтвержденных изображений из Firestore
+// Загрузка проверенных изображений
 async function loadApprovedImages() {
-    const imagesCollection = collection(db, "images");
-    const imagesSnapshot = await getDocs(imagesCollection);
-    const approvedContainer = document.getElementById("approvedImages");
-    approvedContainer.innerHTML = ""; // Очищаем контейнер перед загрузкой новых данных
-    imagesSnapshot.forEach((doc) => {
-        if (doc.data().approved) {
-            const imageElement = document.createElement("img");
-            imageElement.src = doc.data().url;
-            imageElement.alt = "Approved Image";
-            imageElement.classList.add("approved-image");
-            approvedContainer.appendChild(imageElement);
-        }
+    const approvedSnapshot = await getDocs(collection(db, "approved_images"));
+    approvedImages.innerHTML = "";
+    approvedSnapshot.forEach(async (doc) => {
+        const imageUrl = await getDownloadURL(ref(storage, doc.data().path));
+        const imgElement = document.createElement("img");
+        imgElement.src = imageUrl;
+        approvedImages.appendChild(imgElement);
     });
 }
 
-// Инициализация загрузки изображений при старте страницы
-loadApprovedImages();
+// Загрузка ожидающих изображений
+async function loadPendingImages() {
+    const pendingSnapshot = await getDocs(collection(db, "pending_images"));
+    pendingImages.innerHTML = "";
+    pendingSnapshot.forEach(async (doc) => {
+        const imageUrl = await getDownloadURL(ref(storage, doc.data().path));
+        const imgElement = document.createElement("img");
+        imgElement.src = imageUrl;
+        pendingImages.appendChild(imgElement);
 
+        // Кнопка для подтверждения изображения
+        const approveButton = document.createElement("button");
+        approveButton.textContent = "Подтвердить";
+        approveButton.addEventListener("click", async () => {
+            try {
+                await addDoc(collection(db, "approved_images"), { path: doc.data().path });
+                await deleteDoc(doc(db, "pending_images", doc.id));
+                loadApprovedImages();
+                loadPendingImages();
+            } catch (error) {
+                console.error("Ошибка при подтверждении изображения: ", error);
+            }
+        });
+        pendingImages.appendChild(approveButton);
+    });
+}
+
+// Начальная загрузка правил и изображений
+loadRules();
+loadApprovedImages();
