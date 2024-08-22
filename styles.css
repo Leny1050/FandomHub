@@ -1,19 +1,19 @@
-    /* Общие стили */
+/* Общие стили */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f4f8;
+    background-color: #121212; /* Темный фон */
     margin: 0;
     padding: 0;
-    color: #333;
+    color: #e0e0e0; /* Светлый текст */
     line-height: 1.6;
 }
 
 header {
-    background-color: #3f51b5;
-    color: white;
+    background-color: #1f1f1f; /* Темный заголовок */
+    color: #ffffff;
     padding: 20px 0;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .header-content {
@@ -36,7 +36,7 @@ p {
 
 /* Кнопки */
 button {
-    background-color: #4CAF50;
+    background-color: #6200ea; /* Фиолетовый цвет */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -47,7 +47,7 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #3700b3; /* Темнее при наведении */
     transform: scale(1.05);
 }
 
@@ -56,17 +56,17 @@ section {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background-color: white;
+    background-color: #1f1f1f; /* Темный фон для секций */
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 /* Заголовки */
 h2 {
     font-size: 1.8rem;
     margin-bottom: 15px;
-    color: #3f51b5;
-    border-bottom: 2px solid #e0e0e0;
+    color: #bb86fc; /* Светлый фиолетовый цвет */
+    border-bottom: 2px solid #333333; /* Темная граница */
     padding-bottom: 10px;
 }
 
@@ -77,9 +77,11 @@ textarea {
     width: calc(100% - 22px);
     padding: 12px;
     margin-bottom: 15px;
-    border: 1px solid #ccc;
+    border: 1px solid #444; /* Темная рамка */
     border-radius: 5px;
     font-size: 1rem;
+    background-color: #333; /* Темный фон для инпутов */
+    color: #e0e0e0; /* Светлый текст */
     transition: border-color 0.3s;
 }
 
@@ -87,12 +89,12 @@ input[type="text"]:focus,
 input[type="file"]:focus,
 textarea:focus {
     outline: none;
-    border-color: #3f51b5;
+    border-color: #bb86fc; /* Фиолетовая рамка при фокусе */
 }
 
 /* Футер */
 footer {
-    background-color: #333;
+    background-color: #1f1f1f; /* Темный футер */
     color: white;
     text-align: center;
     padding: 15px 0;
@@ -101,10 +103,10 @@ footer {
 
 /* Секция с правилами */
 .rules-section {
-    background-color: #e8eaf6;
+    background-color: #1e1e1e; /* Темный фон для секции правил */
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .rules {
@@ -115,12 +117,12 @@ footer {
 .rule-item {
     margin-bottom: 10px;
     padding: 10px;
-    background-color: #ffffff;
+    background-color: #292929; /* Темный фон для правила */
     border-radius: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .rule-item p {
@@ -143,7 +145,7 @@ footer {
 
 .add-rule-container {
     margin-top: 20px;
-    background-color: #e0e0e0;
+    background-color: #333; /* Темный фон для добавления правил */
     padding: 15px;
     border-radius: 5px;
 }
@@ -170,7 +172,7 @@ footer {
     height: 400px;
     overflow: hidden;
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
     display: flex;
     flex-direction: column; /* Вертикальная ориентация для кнопок */
@@ -205,7 +207,6 @@ footer {
     margin-right: 0; /* Убираем отступ для последней кнопки */
 }
 
-
 /* Секция для анкет */
 .application-section {
     margin-top: 30px;
@@ -216,22 +217,22 @@ footer {
 }
 
 .applications-container {
-    background-color: #e8eaf6;
+    background-color: #1e1e1e; /* Темный фон для секции анкет */
     padding: 15px;
     border-radius: 5px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     margin-bottom: 20px;
 }
 
 .applications-container div {
-    background-color: #ffffff;
+    background-color: #292929; /* Темный фон для анкеты */
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .applications-container button {
@@ -244,9 +245,30 @@ footer {
 }
 
 .applications-container button:first-child {
-    background-color: #4CAF50;
+    background-color: #4CAF50; /* Зеленая кнопка для одобрения */
 }
 
 .applications-container button:hover {
     background-color: #d32f2f;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column; /* Вертикальная компоновка для мобильных */
+        align-items: center; /* Центрируем элементы */
+    }
+
+    h1 {
+        font-size: 2rem; /* Уменьшаем размер заголовка на мобильных */
+    }
+
+    .image-container div {
+        width: 100%; /* Ширина изображения 100% на мобильных */
+        height: auto; /* Автоматическая высота */
+    }
+
+    .applications-container div {
+        flex-direction: column; /* Вертикальная компоновка анкеты */
+    }
 }
