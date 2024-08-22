@@ -1,19 +1,19 @@
 /* Общие стили */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #121212; /* Темный фон */
+    background-color: #f0f4f8;
     margin: 0;
     padding: 0;
-    color: #E0E0E0; /* Светлый текст */
+    color: #333;
     line-height: 1.6;
 }
 
 header {
-    background-color: #1E1E1E; /* Темный заголовок */
-    color: #E0E0E0;
+    background-color: #3f51b5;
+    color: white;
     padding: 20px 0;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
@@ -28,7 +28,6 @@ header {
 h1 {
     font-size: 2.5rem;
     margin: 0;
-    color: #BB86FC; /* Цвет заголовка */
 }
 
 p {
@@ -37,7 +36,7 @@ p {
 
 /* Кнопки */
 button {
-    background-color: #6200EA; /* Цвет кнопок */
+    background-color: #4CAF50;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -48,7 +47,7 @@ button {
 }
 
 button:hover {
-    background-color: #3700B3; /* Цвет кнопки при наведении */
+    background-color: #45a049;
     transform: scale(1.05);
 }
 
@@ -57,17 +56,17 @@ section {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #1E1E1E; /* Темный фон секций */
+    background-color: white;
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Заголовки */
 h2 {
     font-size: 1.8rem;
     margin-bottom: 15px;
-    color: #BB86FC; /* Цвет заголовков */
-    border-bottom: 2px solid #373737; /* Цвет нижней границы заголовков */
+    color: #3f51b5;
+    border-bottom: 2px solid #e0e0e0;
     padding-bottom: 10px;
 }
 
@@ -78,11 +77,9 @@ textarea {
     width: calc(100% - 22px);
     padding: 12px;
     margin-bottom: 15px;
-    border: 1px solid #444; /* Темная рамка для вводов */
+    border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 1rem;
-    background-color: #1E1E1E; /* Темный фон для вводов */
-    color: #E0E0E0; /* Светлый текст для вводов */
     transition: border-color 0.3s;
 }
 
@@ -90,13 +87,13 @@ input[type="text"]:focus,
 input[type="file"]:focus,
 textarea:focus {
     outline: none;
-    border-color: #BB86FC; /* Цвет рамки при фокусе */
+    border-color: #3f51b5;
 }
 
 /* Футер */
 footer {
-    background-color: #1E1E1E; /* Темный футер */
-    color: #E0E0E0;
+    background-color: #333;
+    color: white;
     text-align: center;
     padding: 15px 0;
     position: relative;
@@ -104,10 +101,10 @@ footer {
 
 /* Секция с правилами */
 .rules-section {
-    background-color: #1C1C1C; /* Темный фон секции правил */
+    background-color: #e8eaf6;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .rules {
@@ -118,12 +115,12 @@ footer {
 .rule-item {
     margin-bottom: 10px;
     padding: 10px;
-    background-color: #282828; /* Темный фон для правила */
+    background-color: #ffffff;
     border-radius: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .rule-item p {
@@ -132,7 +129,7 @@ footer {
 }
 
 .delete-button {
-    background-color: #f44336; /* Цвет кнопки удаления */
+    background-color: #f44336;
     border: none;
     padding: 5px 10px;
     border-radius: 5px;
@@ -141,14 +138,23 @@ footer {
 }
 
 .delete-button:hover {
-    background-color: #d32f2f; /* Цвет кнопки удаления при наведении */
+    background-color: #d32f2f;
 }
 
 .add-rule-container {
     margin-top: 20px;
-    background-color: #282828; /* Темный фон для добавления правил */
+    background-color: #e0e0e0;
     padding: 15px;
     border-radius: 5px;
+}
+
+.add-rule input {
+    width: calc(100% - 120px);
+    margin-right: 10px;
+}
+
+.add-rule button {
+    width: 100px;
 }
 
 /* Секция для изображений */
@@ -164,10 +170,10 @@ footer {
     height: 400px;
     overflow: hidden;
     border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s;
-    display: flex; /* Вертикальная ориентация для кнопок */
-    flex-direction: column; /* Гибкая компоновка для кнопок */
+    display: flex;
+    flex-direction: column; /* Вертикальная ориентация для кнопок */
     justify-content: flex-end; /* Снизу по вертикали */
 }
 
@@ -187,59 +193,38 @@ footer {
 .image-container button {
     flex: 1; /* Каждая кнопка занимает равное пространство */
     padding: 5px;
-    background-color: rgba(255, 255, 255, 0.1); /* Полупрозрачный фон для кнопок */
+    background-color: rgba(0, 0, 0, 0.7);
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin: 0 5px; /* Отступ между кнопками */
     transition: background-color 0.3s;
 }
 
 .image-container button:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Цвет кнопки при наведении */
+    background-color: rgba(0, 0, 0, 0.9);
 }
 
-/* Секция для анкет */
+/* Стили для форм анкеты */
 .application-section {
-    margin-top: 30px;
-}
-
-.application-section form {
-    margin-bottom: 20px;
+    background-color: #e0f7fa;
 }
 
 .applications-container {
-    background-color: #1C1C1C; /* Темный фон для секции анкет */
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    margin-bottom: 20px;
-}
-
-.applications-container div {
-    background-color: #282828; /* Темный фон для блока анкеты */
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    flex-direction: column;
+    gap: 10px;
 }
 
-.applications-container button {
-    background-color: #f44336; /* Цвет кнопки удаления */
-    border: none;
-    padding: 5px 10px;
+#pendingApplications,
+#approvedApplications {
+    padding: 10px;
+    background-color: white;
     border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.applications-container button:first-child {
-    background-color: #4CAF50; /* Цвет кнопки подтверждения */
-}
-
-.applications-container button:hover {
-    background-color: #d32f2f; /* Цвет кнопки при наведении */
+.application-section label {
+    font-weight: bold;
 }
