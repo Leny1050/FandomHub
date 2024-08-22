@@ -26,7 +26,7 @@
     <div class="rules-container">
         <h2>Правила Чата</h2>
         <ul id="rules" class="rules">
-            <li>Загрузка правил... если не открывается, нажмите "Версия для ПК"</li>
+            <li>Загрузка правил... если не открывается нажмите "Версия для ПК"</li>
         </ul>
     </div>
 
@@ -51,6 +51,26 @@
     <div class="image-container" id="pendingContainer" style="display: none;">
         <h2>Ожидающие проверки</h2>
         <div id="pendingImages"></div>
+    </div>
+</section>
+
+<!-- Секция для анкет на вступление -->
+<section class="application-section">
+    <h2>Отправить анкету на вступление</h2>
+    <form id="applicationForm">
+        <label for="role">На какую роль? и ваш юз тг</label><br>
+        <input type="text" id="role" name="role" required><br><br>
+        <label for="fandom">К какому фандому относится персонаж?</label><br>
+        <input type="text" id="fandom" name="fandom" required><br><br>
+        <button type="submit">Отправить анкету</button>
+    </form>
+    <div class="applications-container" id="applicationsContainer" style="display: none;">
+        <h2>Ожидающие анкеты</h2>
+        <div id="pendingApplications"></div>
+    </div>
+    <div class="applications-container" id="approvedContainer" style="display: none;">
+        <h2>Занятые роли</h2>
+        <div id="approvedApplications"></div>
     </div>
 </section>
 
