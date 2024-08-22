@@ -191,14 +191,14 @@ footer {
 }
 
 .image-container button {
-    flex: 1; /* Каждая кнопка занимает равное пространство */
-    padding: 5px;
-    background-color: rgba(0, 0, 0, 0.7);
+    flex: 1; /* Растянуть кнопки на доступное пространство */
+    padding: 10px;
+    margin: 0 5px; /* Отступ между кнопками */
+    background-color: rgba(0, 0, 0, 0.8);
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin: 0 5px; /* Отступ между кнопками */
     transition: background-color 0.3s;
 }
 
@@ -206,25 +206,13 @@ footer {
     background-color: rgba(0, 0, 0, 0.9);
 }
 
-/* Стили для форм анкеты */
+/* Секция для анкет */
 .application-section {
-    background-color: #e0f7fa;
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 10px;
 }
 
 .applications-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-#pendingApplications,
-#approvedApplications {
-    padding: 10px;
-    background-color: white;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.application-section label {
-    font-weight: bold;
+    margin-top: 20px;
 }
