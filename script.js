@@ -32,8 +32,12 @@ const approvedImages = document.getElementById("approvedImages");
 const pendingContainer = document.getElementById("pendingContainer");
 const pendingImages = document.getElementById("pendingImages");
 
+// Переменная для хранения текущего пользователя
+let currentUser = null;
+
 // Обработка аутентификации
 onAuthStateChanged(auth, (user) => {
+    currentUser = user;
     if (user) {
         loginButton.style.display = "none";
         logoutButton.style.display = "inline-block";
@@ -83,7 +87,7 @@ async function loadRules() {
         ruleItem.classList.add("rule-item");
         ruleItem.innerHTML = `
             <p>${doc.data().text}</p>
-            <button class="delete-button" data-id="${doc.id}">Удалить</button>
+            <button class="delete-button" data-id="${doc.id}" style="display: ${currentUser ? 'inline' : 'none'};">Удалить</button>
         `;
         rulesList.appendChild(ruleItem);
     });
@@ -95,6 +99,11 @@ function attachDeleteHandlers() {
     const deleteButtons = document.querySelectorAll(".delete-button");
     deleteButtons.forEach((button) => {
         button.addEventListener("click", async (e) => {
+            if (!currentUser) {
+                alert("Вы должны быть авторизованы для удаления правил.");
+                return;
+            }
+
             const ruleId = e.target.dataset.id;
             try {
                 await deleteDoc(doc(db, "rules", ruleId));
@@ -163,3 +172,4 @@ async function loadPendingImages() {
 // Начальная загрузка правил и изображений
 loadRules();
 loadApprovedImages();
+
