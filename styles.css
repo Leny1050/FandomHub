@@ -1,74 +1,112 @@
-/* Общие настройки */
+/* Общие стили */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #2c3e50; /* Темно-синий фон */
-    color: #ecf0f1; /* Светлый цвет текста */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #121212; /* Темный фон */
     margin: 0;
     padding: 0;
+    color: #E0E0E0; /* Светлый текст */
     line-height: 1.6;
 }
 
-/* Шапка */
 header {
-    background-color: #34495e; /* Темно-синий шапка */
-    color: #ecf0f1;
+    background-color: #1F1F1F; /* Темный заголовок */
+    color: #E0E0E0;
     padding: 20px 0;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
 }
 
-header h1 {
-    margin: 0;
-    font-size: 2.5em;
-    font-weight: bold;
-}
-
-header p {
-    font-size: 1.2em;
-    margin-top: 5px;
-}
-
-#auth-container {
-    margin-top: 10px;
-}
-
-#loginButton, #logoutButton {
-    padding: 10px 20px;
-    background-color: #ecf0f1; /* Светлая кнопка */
-    color: #34495e; /* Темный текст */
-    border: 2px solid #ecf0f1;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-#loginButton:hover, #logoutButton:hover {
-    background-color: #4a90e2; /* При наведении на кнопку */
-    color: #fff; /* Белый текст при наведении */
-}
-
-/* Секция правил */
-.rules-section {
-    padding: 40px 20px;
-    background-color: #34495e; /* Темный фон секции правил */
-    border-top: 4px solid #4a90e2; /* Синяя граница сверху */
-    margin-top: 20px;
-}
-
-.rules-container {
-    max-width: 800px;
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
     margin: 0 auto;
-    background-color: #2c3e50; /* Темный фон для контейнера правил */
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    padding: 0 20px;
 }
 
-.rules-container h2 {
-    font-size: 2em;
-    margin-bottom: 20px;
-    color: #4a90e2; /* Синяя надпись */
+h1 {
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+p {
+    margin: 0;
+}
+
+/* Кнопки */
+button {
+    background-color: #BB86FC; /* Цвет кнопок */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+button:hover {
+    background-color: #9A67EA; /* Цвет кнопки при наведении */
+    transform: scale(1.05);
+}
+
+/* Секции */
+section {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #1E1E1E; /* Темный фон секций */
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Заголовки */
+h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #BB86FC; /* Цвет заголовков */
+    border-bottom: 2px solid #373737; /* Цвет нижней границы заголовков */
+    padding-bottom: 10px;
+}
+
+/* Ввод данных */
+input[type="text"],
+input[type="file"],
+textarea {
+    width: calc(100% - 22px);
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #444; /* Темная рамка для вводов */
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #1E1E1E; /* Темный фон для вводов */
+    color: #E0E0E0; /* Светлый текст для вводов */
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="file"]:focus,
+textarea:focus {
+    outline: none;
+    border-color: #BB86FC; /* Цвет рамки при фокусе */
+}
+
+/* Футер */
+footer {
+    background-color: #1F1F1F; /* Темный футер */
+    color: #E0E0E0;
+    text-align: center;
+    padding: 15px 0;
+    position: relative;
+}
+
+/* Секция с правилами */
+.rules-section {
+    background-color: #2C2C2C; /* Темный фон секции правил */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .rules {
@@ -77,151 +115,84 @@ header p {
 }
 
 .rule-item {
-    background-color: #2c3e50; /* Темный фон для правил */
-    padding: 15px;
     margin-bottom: 10px;
+    padding: 10px;
+    background-color: #373737; /* Темный фон для правила */
     border-radius: 5px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
 }
 
 .rule-item p {
     margin: 0;
+    flex-grow: 1;
 }
 
 .delete-button {
-    background-color: #e74c3c; /* Красная кнопка удаления */
-    color: #fff;
+    background-color: #f44336; /* Цвет кнопки удаления */
     border: none;
-    padding: 8px 12px;
+    padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
-    font-weight: bold;
     transition: background-color 0.3s;
 }
 
 .delete-button:hover {
-    background-color: #c0392b; /* Темно-красный при наведении */
+    background-color: #d32f2f; /* Цвет кнопки удаления при наведении */
 }
 
-/* Добавление нового правила */
 .add-rule-container {
-    margin-top: 30px;
-    background-color: #34495e; /* Темный фон контейнера для добавления правила */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-}
-
-.add-rule-container h2 {
-    font-size: 1.8em;
-    margin-bottom: 20px;
-    color: #4a90e2; /* Синяя надпись */
-}
-
-.add-rule {
-    display: flex;
-    justify-content: space-between;
-}
-
-.add-rule input {
-    flex-grow: 1;
-    padding: 10px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 1em;
-    margin-right: 10px;
-}
-
-.add-rule button {
-    background-color: #4a90e2; /* Синяя кнопка добавления */
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-}
-
-.add-rule button:hover {
-    background-color: #357abd; /* Темно-синяя кнопка при наведении */
-}
-
-/* Секция изображений */
-.image-section {
-    padding: 40px 20px;
-    background-color: #34495e; /* Темный фон секции изображений */
-    border-top: 4px solid #4a90e2; /* Синяя граница сверху */
     margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.image-section h2 {
-    font-size: 2em;
-    color: #4a90e2; /* Синяя надпись */
-    margin-bottom: 20px;
-}
-
-.image-section input[type="file"] {
-    margin-bottom: 15px;
-    padding: 10px;
-    border: 2px solid #ddd;
+    background-color: #2C2C2C; /* Темный фон для добавления правил */
+    padding: 15px;
     border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
 }
 
-.image-section button {
-    background-color: #4a90e2; /* Синяя кнопка загрузки */
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
-    margin-bottom: 20px;
-}
-
-.image-section button:hover {
-    background-color: #357abd; /* Темно-синяя кнопка при наведении */
-}
-
+/* Секция для изображений */
 .image-container {
-    background-color: #2c3e50; /* Темный фон для контейнера изображений */
-    padding: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.image-container div {
+    position: relative;
+    width: 400px; /* Размеры блока изображения */
+    height: 400px;
+    overflow: hidden;
     border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-    max-width: 800px;
-    width: 100%;
-    margin-top: 20px;
-    text-align: center;
+    box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s;
+    display: flex; /* Вертикальная ориентация для кнопок */
+    flex-direction: column; /* Гибкая компоновка для кнопок */
+    justify-content: flex-end; /* Снизу по вертикали */
 }
 
 .image-container img {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 20px;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.image-container .button-container {
+    display: flex; /* Гибкая компоновка для кнопок */
+    justify-content: space-between; /* Пространство между кнопками */
+    margin-top: 5px; /* Отступ между изображением и кнопками */
 }
 
 .image-container button {
-    margin-top: 10px;
+    flex: 1; /* Каждая кнопка занимает равное пространство */
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.1); /* Полупрозрачный фон для кнопок */
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-/* Footer */
-footer {
-    background-color: #34495e; /* Темный фон подвала */
-    color: #ecf0f1; /* Светлый текст */
-    padding: 20px;
-    text-align: center;
-    margin-top: 40px;
-    font-size: 1em;
-    border-top: 4px solid #4a90e2; /* Синяя граница сверху */
+.image-container button:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Цвет кнопки при наведении */
 }
