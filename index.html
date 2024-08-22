@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Флуд по Фандомам</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Подключение стилей -->
+    <link rel="stylesheet" href="styles.css"> <!-- Подключение CSS -->
 </head>
 <body>
 
@@ -16,7 +16,7 @@
         </div>
         <div id="auth-container">
             <button id="loginButton">Войти</button>
-            <button id="logoutButton" style="display: none;">Выйти</button> <!-- Исправлено -->
+            <button id="logoutButton" style="display: none;">Выйти</button>
         </div>
     </div>
 </header>
@@ -30,7 +30,7 @@
         </ul>
     </div>
 
-    <div class="add-rule-container" id="addRuleContainer" style="display: none;"> <!-- Исправлено -->
+    <div class="add-rule-container" id="addRuleContainer" style="display: none;">
         <h2>Добавить новое правило</h2>
         <div class="add-rule">
             <input type="text" id="new-rule" placeholder="Введите новое правило">
@@ -48,7 +48,7 @@
         <h2>Проверенные изображения</h2>
         <div id="approvedImages"></div>
     </div>
-    <div class="image-container" id="pendingContainer" style="display: none;"> <!-- Исправлено -->
+    <div class="image-container" id="pendingContainer" style="display: none;">
         <h2>Ожидающие проверки</h2>
         <div id="pendingImages"></div>
     </div>
@@ -64,11 +64,11 @@
         <input type="text" id="fandom" name="fandom" required><br><br>
         <button type="submit">Отправить анкету</button>
     </form>
-    <div class="applications-container" id="applicationsContainer" style="display: none;"> <!-- Исправлено -->
+    <div class="applications-container" id="applicationsContainer" style="display: none;">
         <h2>Ожидающие анкеты</h2>
         <div id="pendingApplications"></div>
     </div>
-    <div class="applications-container" id="approvedContainer" style="display: none;"> <!-- Исправлено -->
+    <div class="applications-container" id="approvedContainer" style="display: none;">
         <h2>Занятые роли</h2>
         <div id="approvedApplications"></div>
     </div>
@@ -77,8 +77,8 @@
 <footer>
     <p>&copy; 2024 Флуд по всем фандомам. Все права защищены.</p>
 </footer>
-    
-<!-- Firebase CDN -->
+
+<!-- Подключение скрипта -->
 <script type="module" src="script.js"></script>
 
 </body>
