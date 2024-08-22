@@ -1,10 +1,9 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js';
+import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.9.3/firebase-firestore.js';
+import { getAuth, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/9.9.3/firebase-auth.js';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/9.9.3/firebase-storage.js';
 
-   // Firebase конфигурация
+// Настройки Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyA8NY2vDCOd5ePK5fDMWaMd2JfsRrTabf4",
     authDomain: "flud-73dba.firebaseapp.com",
@@ -28,268 +27,178 @@ const allowedEmails = [
     "fludvsefd500@gmail.com"
 ];
 
-// Функция для проверки состояния аутентификации
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        document.getElementById('addRuleContainer').style.display = 'block';
-        document.getElementById('pendingContainer').style.display = 'block';
-        document.getElementById('applicationsContainer').style.display = 'block';
-        document.getElementById('approvedContainer').style.display = 'block';
-        document.getElementById('loginButton').style.display = 'none';
-        document.getElementById('logoutButton').style.display = 'inline-block';
-    } else {
-        document.getElementById('addRuleContainer').style.display = 'none';
-        document.getElementById('pendingContainer').style.display = 'none';
-        document.getElementById('applicationsContainer').style.display = 'none';
-        document.getElementById('approvedContainer').style.display = 'none';
-        document.getElementById('loginButton').style.display = 'inline-block';
-        document.getElementById('logoutButton').style.display = 'none';
+// Элементы интерфейса
+const rulesContainer = document.getElementById('rules');
+const addRuleContainer = document.getElementById('addRuleContainer');
+const newRuleInput = document.getElementById('new-rule');
+const addRuleButton = document.getElementById('addRuleButton');
+const imageUpload = document.getElementById('imageUpload');
+const uploadImageButton = document.getElementById('uploadImageButton');
+const approvedImages = document.getElementById('approvedImages');
+const pendingImages = document.getElementById('pendingImages');
+const applicationsContainer = document.getElementById('applicationsContainer');
+const approvedApplications = document.getElementById('approvedApplications');
+const pendingApplications = document.getElementById('pendingApplications');
+const applicationForm = document.getElementById('applicationForm');
+const loginButton = document.getElementById('loginButton');
+const logoutButton = document.getElementById('logoutButton');
+
+// Функция для загрузки правил из Firestore
+async function loadRules() {
+    const rulesQuery = query(collection(db, 'rules'));
+    const rulesSnapshot = await getDocs(rulesQuery);
+    rulesContainer.innerHTML = ''; // Очищаем текущее содержимое
+    rulesSnapshot.forEach((doc) => {
+        const ruleItem = document.createElement('li');
+        ruleItem.classList.add('rule-item');
+        ruleItem.innerHTML = `<p>${doc.data().text}</p><button class="delete-button" onclick="deleteRule('${doc.id}')">Удалить</button>`;
+        rulesContainer.appendChild(ruleItem);
+    });
+}
+
+// Функция для добавления правила в Firestore
+addRuleButton.addEventListener('click', async () => {
+    const newRule = newRuleInput.value.trim();
+    if (newRule) {
+        await addDoc(collection(db, 'rules'), { text: newRule });
+        newRuleInput.value = '';
+        loadRules(); // Обновить список правил
     }
-    loadRules();  // Загружаем правила при изменении статуса аутентификации
-    loadImages();  // Загружаем изображения при изменении статуса аутентификации
-    loadApplications();  // Загружаем анкеты при изменении статуса аутентификации
 });
 
-// Вход пользователя
-document.getElementById('loginButton').addEventListener('click', () => {
+// Функция для удаления правила из Firestore
+window.deleteRule = async function (ruleId) {
+    await deleteDoc(doc(db, 'rules', ruleId));
+    loadRules(); // Обновить список правил
+};
+
+// Функция для загрузки изображений
+uploadImageButton.addEventListener('click', async () => {
+    const file = imageUpload.files[0];
+    if (file) {
+        const storageRef = ref(storage, `images/${file.name}`);
+        await uploadBytes(storageRef, file);
+        const downloadURL = await getDownloadURL(storageRef);
+        
+        // Добавить в коллекцию ожидания
+        await addDoc(collection(db, 'pendingImages'), { url: downloadURL });
+        imageUpload.value = ''; // Очистить поле загрузки
+        loadImages(); // Обновить список изображений
+    }
+});
+
+// Функция для загрузки изображений из Firestore
+async function loadImages() {
+    const pendingImagesSnapshot = await getDocs(collection(db, 'pendingImages'));
+    pendingImages.innerHTML = ''; // Очищаем текущее содержимое
+    pendingImagesSnapshot.forEach((doc) => {
+        const imageUrl = doc.data().url;
+        const imageItem = document.createElement('div');
+        imageItem.innerHTML = `<img src="${imageUrl}" alt="Загруженное изображение" /><div class="button-container"><button onclick="approveImage('${doc.id}')">Одобрить</button><button onclick="removeImage('${doc.id}')">Удалить</button></div>`;
+        pendingImages.appendChild(imageItem);
+    });
+
+    const approvedImagesSnapshot = await getDocs(collection(db, 'approvedImages'));
+    approvedImages.innerHTML = ''; // Очищаем текущее содержимое
+    approvedImagesSnapshot.forEach((doc) => {
+        const imageUrl = doc.data().url;
+        const imageItem = document.createElement('div');
+        imageItem.innerHTML = `<img src="${imageUrl}" alt="Одобренное изображение" />`;
+        approvedImages.appendChild(imageItem);
+    });
+}
+
+// Функция для одобрения изображения
+window.approveImage = async function (imageId) {
+    const imageRef = doc(db, 'pendingImages', imageId);
+    const imageDoc = await getDoc(imageRef);
+    
+    // Добавляем в коллекцию одобренных изображений
+    await addDoc(collection(db, 'approvedImages'), { url: imageDoc.data().url });
+    await deleteDoc(imageRef); // Удаляем из ожидания
+    loadImages(); // Обновить список изображений
+};
+
+// Функция для удаления изображения
+window.removeImage = async function (imageId) {
+    await deleteDoc(doc(db, 'pendingImages', imageId));
+    loadImages(); // Обновить список изображений
+};
+
+// Функция для загрузки анкет
+async function loadApplications() {
+    const applicationsSnapshot = await getDocs(collection(db, 'applications'));
+    pendingApplications.innerHTML = ''; // Очищаем текущее содержимое
+    approvedApplications.innerHTML = ''; // Очищаем текущее содержимое
+    applicationsSnapshot.forEach((doc) => {
+        const application = doc.data();
+        const applicationItem = document.createElement('div');
+        applicationItem.innerHTML = `<p>Роль: ${application.role}, Фандом: ${application.fandom}</p><button onclick="approveApplication('${doc.id}')">Одобрить</button><button onclick="removeApplication('${doc.id}')">Удалить</button>`;
+        pendingApplications.appendChild(applicationItem);
+    });
+}
+
+// Функция для обработки отправки анкеты
+applicationForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const role = document.getElementById('role').value;
+    const fandom = document.getElementById('fandom').value;
+    
+    const user = auth.currentUser;
+    if (user && allowedEmails.includes(user.email)) {
+        await addDoc(collection(db, 'applications'), { role, fandom });
+        applicationForm.reset();
+        loadApplications(); // Обновить список анкет
+    } else {
+        alert("У вас нет разрешения на отправку анкеты.");
+    }
+});
+
+// Функция для одобрения анкеты
+window.approveApplication = async function (applicationId) {
+    const applicationRef = doc(db, 'applications', applicationId);
+    const applicationDoc = await getDoc(applicationRef);
+    
+    // Добавляем в коллекцию одобренных анкет
+    await addDoc(collection(db, 'approvedApplications'), applicationDoc.data());
+    await deleteDoc(applicationRef); // Удаляем из ожидания
+    loadApplications(); // Обновить список анкет
+};
+
+// Функция для удаления анкеты
+window.removeApplication = async function (applicationId) {
+    await deleteDoc(doc(db, 'applications', applicationId));
+    loadApplications(); // Обновить список анкет
+};
+
+// Функция для входа пользователя
+loginButton.addEventListener('click', async () => {
     const email = prompt("Введите ваш email:");
     const password = prompt("Введите ваш пароль:");
-    signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
-            alert("Вы успешно вошли в систему!");
-        })
-        .catch((error) => {
-            alert("Ошибка при входе: " + error.message);
-        });
-});
-
-// Выход пользователя
-document.getElementById('logoutButton').addEventListener('click', () => {
-    signOut(auth).then(() => {
-        alert("Вы вышли из системы.");
-    }).catch((error) => {
-        alert("Ошибка при выходе: " + error.message);
-    });
-});
-
-// Функции для загрузки и управления правилами
-async function loadRules() {
-    const querySnapshot = await getDocs(collection(db, "rules"));
-    const rulesContainer = document.getElementById('rules');
-    rulesContainer.innerHTML = "";  // Очистить контейнер
-
-    querySnapshot.forEach((doc) => {
-        const rule = doc.data().text;
-        const ruleElement = document.createElement('li');
-        ruleElement.classList.add('rule-item');
-
-        const ruleText = document.createElement('p');
-        ruleText.textContent = rule;
-
-        // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
-        if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.classList.add('delete-button');
-            deleteButton.onclick = () => deleteRule(doc.id);
-
-            ruleElement.appendChild(ruleText);
-            ruleElement.appendChild(deleteButton);
-        } else {
-            ruleElement.appendChild(ruleText);
-        }
-
-        rulesContainer.appendChild(ruleElement);
-    });
-}
-
-async function addRule() {
-    const newRuleInput = document.getElementById('new-rule');
-    const newRuleText = newRuleInput.value.trim();
-
-    // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
-    if (newRuleText && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-        try {
-            await addDoc(collection(db, "rules"), {
-                text: newRuleText
-            });
-            newRuleInput.value = "";  // Очистить поле ввода
-            loadRules();  // Перезагрузить правила
-        } catch (e) {
-            alert("Ошибка при добавлении правила: " + e.message);
-        }
-    } else {
-        alert("Пожалуйста, войдите в систему с разрешенным адресом электронной почты для добавления правила.");
-    }
-}
-document.getElementById('addRuleButton').addEventListener('click', addRule);
-
-async function deleteRule(id) {
+    
     try {
-        await deleteDoc(doc(db, "rules", id));
-        loadRules();  // Перезагрузить правила после удаления
-    } catch (e) {
-        alert("Ошибка при удалении правила: " + e.message);
-    }
-}
-
-// Функции для загрузки и управления изображениями
-async function loadImages() {
-    const approvedImagesContainer = document.getElementById('approvedImages');
-    const pendingImagesContainer = document.getElementById('pendingImages');
-    approvedImagesContainer.innerHTML = "";  // Очистить контейнер для одобренных изображений
-    pendingImagesContainer.innerHTML = "";  // Очистить контейнер для ожидающих изображений
-
-    const querySnapshot = await getDocs(collection(db, "images"));
-    querySnapshot.forEach((doc) => {
-        const imageUrl = doc.data().url;
-        const status = doc.data().status;  // "approved" или "pending"
-
-        const imageElement = document.createElement('div');
-        const img = document.createElement('img');
-        img.src = imageUrl;
-        imageElement.appendChild(img);
-
-        if (status === "approved") {
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteImage(doc.id, imageUrl);
-            imageElement.appendChild(deleteButton);  // Добавляем кнопку удаления
-            approvedImagesContainer.appendChild(imageElement);
-        } else if (status === "pending" && auth.currentUser) {
-            const approveButton = document.createElement('button');
-            approveButton.textContent = "Одобрить";
-            approveButton.onclick = () => approveImage(doc.id, imageUrl);
-
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteImage(doc.id, imageUrl);
-
-            imageElement.appendChild(approveButton);
-            imageElement.appendChild(deleteButton);
-            pendingImagesContainer.appendChild(imageElement);
-        }
-    });
-}
-
-document.getElementById('uploadImageButton').addEventListener('click', async () => {
-    const fileInput = document.getElementById('imageUpload');
-    const file = fileInput.files[0];
-    if (!file) return;
-
-    const storageRef = ref(storage, 'images/' + file.name);
-    try {
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        await addDoc(collection(db, "images"), {
-            url: url,
-            status: "pending"
-        });
-        alert("Изображение загружено и ожидает проверки.");
-        loadImages();  // Перезагрузить изображения после загрузки
-    } catch (e) {
-        alert("Ошибка при загрузке изображения: " + e.message);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('Успешный вход:', userCredential.user);
+        loadRules();
+        loadImages();
+        loadApplications();
+        loginButton.style.display = 'none';
+        logoutButton.style.display = 'inline';
+        addRuleContainer.style.display = 'block'; // Показываем контейнер для добавления правил
+    } catch (error) {
+        console.error('Ошибка входа:', error);
+        alert('Ошибка входа: ' + error.message);
     }
 });
 
-async function approveImage(id, url) {
-    try {
-        const imageRef = doc(db, "images", id);
-        await updateDoc(imageRef, {
-            status: "approved"
-        });
-        loadImages();  // Перезагрузить изображения после одобрения
-    } catch (e) {
-        alert("Ошибка при одобрении изображения: " + e.message);
-    }
-}
-
-async function deleteImage(id, url) {
-    try {
-        const storageRef = ref(storage, url);
-        await deleteObject(storageRef);
-        await deleteDoc(doc(db, "images", id));
-        loadImages();  // Перезагрузить изображения после удаления
-    } catch (e) {
-        alert("Ошибка при удалении изображения: " + e.message);
-    }
-}
-
-// Функции для загрузки и управления анкетами
-async function loadApplications() {
-    const pendingApplicationsContainer = document.getElementById('pendingApplications');
-    const approvedApplicationsContainer = document.getElementById('approvedApplications');
-    pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
-    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
-
-    const querySnapshot = await getDocs(collection(db, "applications"));
-    querySnapshot.forEach((doc) => {
-        const application = doc.data();
-        const role = application.role;
-        const fandom = application.fandom;
-        const status = application.status;  // "pending" или "approved"
-
-        const applicationElement = document.createElement('div');
-        applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
-
-        if (status === "pending" && auth.currentUser) {
-            const approveButton = document.createElement('button');
-            approveButton.textContent = "Одобрить";
-            approveButton.onclick = () => approveApplication(doc.id, role, fandom);
-
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteApplication(doc.id);
-
-            applicationElement.appendChild(approveButton);
-            applicationElement.appendChild(deleteButton);
-            pendingApplicationsContainer.appendChild(applicationElement);
-        } else if (status === "approved") {
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteApplication(doc.id);
-
-            applicationElement.appendChild(deleteButton);
-            approvedApplicationsContainer.appendChild(applicationElement);
-        }
-    });
-}
-
-document.getElementById('applicationForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const role = document.getElementById('role').value.trim();
-    const fandom = document.getElementById('fandom').value.trim();
-
-    try {
-        await addDoc(collection(db, "applications"), {
-            role: role,
-            fandom: fandom,
-            status: "pending"
-        });
-        alert("Ваша анкета отправлена и ожидает проверки.");
-        loadApplications();  // Перезагрузить анкеты после отправки
-    } catch (e) {
-        alert("Ошибка при отправке анкеты: " + e.message);
-    }
+// Функция для выхода пользователя
+logoutButton.addEventListener('click', async () => {
+    await signOut(auth);
+    console.log('Пользователь вышел');
+    loginButton.style.display = 'inline';
+    logoutButton.style.display = 'none';
+    addRuleContainer.style.display = 'none'; // Скрываем контейнер для добавления правил
 });
 
-async function approveApplication(id, role, fandom) {
-    try {
-        const applicationRef = doc(db, "applications", id);
-        await updateDoc(applicationRef, {
-            status: "approved"
-        });
-        loadApplications();  // Перезагрузить анкеты после одобрения
-    } catch (e) {
-        alert("Ошибка при одобрении анкеты: " + e.message);
-    }
-}
-
-async function deleteApplication(id) {
-    try {
-        await deleteDoc(doc(db, "applications", id));
-        loadApplications();  // Перезагрузить анкеты после удаления
-    } catch (e) {
-        alert("Ошибка при удалении анкеты: " + e.message);
-    }
-}
+// Загрузка правил при первой загрузке страницы
+loadRules();
