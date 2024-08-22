@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Флуд по Фандомам</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <div>
+            <h1>Флуд по всем фандомам</h1>
+            <p>Место для общения и обсуждений всех ваших любимых фандомов!</p>
+        </div>
+        <div id="auth-container">
+            <button id="loginButton">Войти</button>
+            <button id="logoutButton" style="display: none;">Выйти</button>
+        </div>
+    </div>
+</header>
+
+<!-- Секция с правилами -->
+<section class="rules-section">
+    <div class="rules-container">
+        <h2>Правила Чата</h2>
+        <ul id="rules" class="rules">
+            <li>Загрузка правил... если не открывается нажмите "Версия для ПК"</li>
+        </ul>
+    </div>
+
+    <div class="add-rule-container" id="addRuleContainer" style="display: none;">
+        <h2>Добавить новое правило</h2>
+        <div class="add-rule">
+            <input type="text" id="new-rule" placeholder="Введите новое правило">
+            <button id="addRuleButton">Добавить</button>
+        </div>
+    </div>
+</section>
+
+<!-- Новая секция для загрузки изображений -->
+<section class="image-section">
+    <h2>Загрузить изображение</h2>
+    <input type="file" id="imageUpload" accept="image/*">
+    <button id="uploadImageButton">Загрузить</button>
+    <div class="image-container" id="imageContainer">
+        <h2>Проверенные изображения</h2>
+        <div id="approvedImages"></div>
+    </div>
+    <div class="image-container" id="pendingContainer" style="display: none;">
+        <h2>Ожидающие проверки</h2>
+        <div id="pendingImages"></div>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2024 Флуд по всем фандомам. Все права защищены.</p>
+</footer>
+
+<!-- Firebase и основной скрипт -->
+<script src="script.js" type="module"></script>
+
+</body>
+</html>
+
