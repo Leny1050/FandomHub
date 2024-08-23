@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
-// Firebase конфигурация
+   // Firebase конфигурация
 const firebaseConfig = {
     apiKey: "AIzaSyA8NY2vDCOd5ePK5fDMWaMd2JfsRrTabf4",
     authDomain: "flud-73dba.firebaseapp.com",
@@ -40,7 +40,7 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('addRuleContainer').style.display = 'none';
         document.getElementById('pendingContainer').style.display = 'none';
         document.getElementById('applicationsContainer').style.display = 'none';
-        document.getElementById('approvedContainer').style.display = 'block'; // Занятые роли видны всегда
+        document.getElementById('approvedContainer').style.display = 'none';
         document.getElementById('loginButton').style.display = 'inline-block';
         document.getElementById('logoutButton').style.display = 'none';
     }
@@ -77,36 +77,28 @@ async function loadRules() {
     const rulesContainer = document.getElementById('rules');
     rulesContainer.innerHTML = "";  // Очистить контейнер
 
-    const uniqueRules = new Set(); // Используем Set для отслеживания уникальных ролей
-
     querySnapshot.forEach((doc) => {
         const rule = doc.data().text;
+        const ruleElement = document.createElement('li');
+        ruleElement.classList.add('rule-item');
 
-        // Добавляем роль в Set, если её там ещё нет
-        if (!uniqueRules.has(rule)) {
-            uniqueRules.add(rule);
+        const ruleText = document.createElement('p');
+        ruleText.textContent = rule;
 
-            const ruleElement = document.createElement('li');
-            ruleElement.classList.add('rule-item');
+        // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
+        if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.classList.add('delete-button');
+            deleteButton.onclick = () => deleteRule(doc.id);
 
-            const ruleText = document.createElement('p');
-            ruleText.textContent = rule;
-
-            // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
-            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = "Удалить";
-                deleteButton.classList.add('delete-button');
-                deleteButton.onclick = () => deleteRule(doc.id);
-
-                ruleElement.appendChild(ruleText);
-                ruleElement.appendChild(deleteButton);
-            } else {
-                ruleElement.appendChild(ruleText);
-            }
-
-            rulesContainer.appendChild(ruleElement);
+            ruleElement.appendChild(ruleText);
+            ruleElement.appendChild(deleteButton);
+        } else {
+            ruleElement.appendChild(ruleText);
         }
+
+        rulesContainer.appendChild(ruleElement);
     });
 }
 
@@ -117,24 +109,11 @@ async function addRule() {
     // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
     if (newRuleText && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
         try {
-            const querySnapshot = await getDocs(collection(db, "rules"));
-            let isDuplicate = false;
-
-            querySnapshot.forEach((doc) => {
-                if (doc.data().text === newRuleText) {
-                    isDuplicate = true;
-                }
+            await addDoc(collection(db, "rules"), {
+                text: newRuleText
             });
-
-            if (isDuplicate) {
-                alert("Такая роль уже существует!");
-            } else {
-                await addDoc(collection(db, "rules"), {
-                    text: newRuleText
-                });
-                newRuleInput.value = "";  // Очистить поле ввода
-                loadRules();  // Перезагрузить правила
-            }
+            newRuleInput.value = "";  // Очистить поле ввода
+            loadRules();  // Перезагрузить правила
         } catch (e) {
             alert("Ошибка при добавлении правила: " + e.message);
         }
@@ -171,12 +150,10 @@ async function loadImages() {
         imageElement.appendChild(img);
 
         if (status === "approved") {
-            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = "Удалить";
-                deleteButton.onclick = () => deleteImage(doc.id, imageUrl);
-                imageElement.appendChild(deleteButton);  // Добавляем кнопку удаления
-            }
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.onclick = () => deleteImage(doc.id, imageUrl);
+            imageElement.appendChild(deleteButton);  // Добавляем кнопку удаления
             approvedImagesContainer.appendChild(imageElement);
         } else if (status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
@@ -207,6 +184,7 @@ document.getElementById('uploadImageButton').addEventListener('click', async () 
             url: url,
             status: "pending"
         });
+        alert("Изображение загружено и ожидает проверки.");
         loadImages();  // Перезагрузить изображения после загрузки
     } catch (e) {
         alert("Ошибка при загрузке изображения: " + e.message);
@@ -236,53 +214,63 @@ async function deleteImage(id, url) {
     }
 }
 
-// Функции для загрузки и управления заявками
+// Функции для загрузки и управления анкетами
 async function loadApplications() {
     const pendingApplicationsContainer = document.getElementById('pendingApplications');
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
-    
     pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
     approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
 
-    const uniqueRoles = new Set(); // Используем Set для отслеживания уникальных ролей
-
     const querySnapshot = await getDocs(collection(db, "applications"));
-    
     querySnapshot.forEach((doc) => {
         const application = doc.data();
         const role = application.role;
         const fandom = application.fandom;
         const status = application.status;  // "pending" или "approved"
 
-        // Проверяем уникальные роли для отображения
-        if (status === "pending" && !uniqueRoles.has(role)) {
-            uniqueRoles.add(role);
+        const applicationElement = document.createElement('div');
+        applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
-            const applicationElement = document.createElement('div');
-            applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
+        if (status === "pending" && auth.currentUser) {
+            const approveButton = document.createElement('button');
+            approveButton.textContent = "Одобрить";
+            approveButton.onclick = () => approveApplication(doc.id, role, fandom);
 
-            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-                const approveButton = document.createElement('button');
-                approveButton.textContent = "Одобрить";
-                approveButton.onclick = () => approveApplication(doc.id, role, fandom);
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.onclick = () => deleteApplication(doc.id);
 
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = "Удалить";
-                deleteButton.onclick = () => deleteApplication(doc.id);
+            applicationElement.appendChild(approveButton);
+            applicationElement.appendChild(deleteButton);
+            pendingApplicationsContainer.appendChild(applicationElement);
+        } else if (status === "approved") {
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.onclick = () => deleteApplication(doc.id);
 
-                applicationElement.appendChild(approveButton);
-                applicationElement.appendChild(deleteButton);
-                pendingApplicationsContainer.appendChild(applicationElement);
-            }
-        } else if (status === "approved" && !uniqueRoles.has(role)) {
-            uniqueRoles.add(role);
-
-            const applicationElement = document.createElement('div');
-            applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom} (Занята)`;
+            applicationElement.appendChild(deleteButton);
             approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
 }
+
+document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const role = document.getElementById('role').value.trim();
+    const fandom = document.getElementById('fandom').value.trim();
+
+    try {
+        await addDoc(collection(db, "applications"), {
+            role: role,
+            fandom: fandom,
+            status: "pending"
+        });
+        alert("Ваша анкета отправлена и ожидает проверки.");
+        loadApplications();  // Перезагрузить анкеты после отправки
+    } catch (e) {
+        alert("Ошибка при отправке анкеты: " + e.message);
+    }
+});
 
 async function approveApplication(id, role, fandom) {
     try {
@@ -290,24 +278,17 @@ async function approveApplication(id, role, fandom) {
         await updateDoc(applicationRef, {
             status: "approved"
         });
-        loadApplications();  // Перезагрузить заявки после одобрения
+        loadApplications();  // Перезагрузить анкеты после одобрения
     } catch (e) {
-        alert("Ошибка при одобрении заявки: " + e.message);
+        alert("Ошибка при одобрении анкеты: " + e.message);
     }
 }
 
 async function deleteApplication(id) {
     try {
         await deleteDoc(doc(db, "applications", id));
-        loadApplications();  // Перезагрузить заявки после удаления
+        loadApplications();  // Перезагрузить анкеты после удаления
     } catch (e) {
-        alert("Ошибка при удалении заявки: " + e.message);
+        alert("Ошибка при удалении анкеты: " + e.message);
     }
 }
-
-// Начальная загрузка данных
-document.addEventListener('DOMContentLoaded', () => {
-    loadRules();
-    loadImages();
-    loadApplications();
-});
