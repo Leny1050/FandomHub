@@ -31,6 +31,7 @@ h1 {
 
 p {
     margin: 0;
+    font-size: 1.2rem;
 }
 
 /* Кнопки */
@@ -163,19 +164,17 @@ footer {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    margin-top: 20px;
 }
 
 .image-container div {
     position: relative;
-    width: 400px; /* Размеры блока изображения */
-    height: 400px;
+    width: calc(33.333% - 20px); /* Ширина блока изображения для сетки */
+    height: 200px; /* Высота блока изображения */
     overflow: hidden;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
-    display: flex;
-    flex-direction: column; /* Вертикальная ориентация для кнопок */
-    justify-content: flex-end; /* Снизу по вертикали */
 }
 
 .image-container img {
