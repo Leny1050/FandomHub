@@ -30,11 +30,9 @@ const allowedEmails = [
 // Функция для проверки состояния аутентификации
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        if (allowedEmails.includes(user.email)) {
-            document.getElementById('addRuleContainer').style.display = 'block';
-            document.getElementById('pendingContainer').style.display = 'block';
-            document.getElementById('applicationsContainer').style.display = 'block';
-        }
+        document.getElementById('addRuleContainer').style.display = 'block';
+        document.getElementById('pendingContainer').style.display = 'block';
+        document.getElementById('applicationsContainer').style.display = 'block';
         document.getElementById('approvedContainer').style.display = 'block';
         document.getElementById('loginButton').style.display = 'none';
         document.getElementById('logoutButton').style.display = 'inline-block';
@@ -42,7 +40,7 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('addRuleContainer').style.display = 'none';
         document.getElementById('pendingContainer').style.display = 'none';
         document.getElementById('applicationsContainer').style.display = 'none';
-        document.getElementById('approvedContainer').style.display = 'block';
+        document.getElementById('approvedContainer').style.display = 'block'; // Занятые роли видны всегда
         document.getElementById('loginButton').style.display = 'inline-block';
         document.getElementById('logoutButton').style.display = 'none';
     }
@@ -159,7 +157,7 @@ async function loadImages() {
                 imageElement.appendChild(deleteButton);  // Добавляем кнопку удаления
             }
             approvedImagesContainer.appendChild(imageElement);
-        } else if (status === "pending" && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+        } else if (status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
             approveButton.onclick = () => approveImage(doc.id, imageUrl);
@@ -208,17 +206,13 @@ async function approveImage(id, url) {
 }
 
 async function deleteImage(id, url) {
-    if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-        try {
-            const imageRef = ref(storage, url);
-            await deleteObject(imageRef);  // Удаление изображения из хранилища
-            await deleteDoc(doc(db, "images", id));  // Удаление записи из Firestore
-            loadImages();  // Перезагрузить изображения после удаления
-        } catch (e) {
-            alert("Ошибка при удалении изображения: " + e.message);
-        }
-    } else {
-        alert("У вас нет прав для удаления этого изображения.");
+    try {
+        const storageRef = ref(storage, url);
+        await deleteObject(storageRef);
+        await deleteDoc(doc(db, "images", id));
+        loadImages();  // Перезагрузить изображения после удаления
+    } catch (e) {
+        alert("Ошибка при удалении изображения: " + e.message);
     }
 }
 
@@ -256,22 +250,41 @@ async function loadApplications() {
                 pendingApplicationsContainer.appendChild(applicationElement);
             }
         } else if (status === "approved") {
-            approvedApplicationsContainer.appendChild(applicationElement);
             if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = "Удалить";
                 deleteButton.onclick = () => deleteApplication(doc.id);
                 applicationElement.appendChild(deleteButton); // Добавить кнопку удаления только для админов
             }
+            approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
 }
 
+async function approveApplication(id, role, fandom) {
+    try {
+        const applicationRef = doc(db, "applications", id);
+        await updateDoc(applicationRef, {
+            status: "approved"
+        });
+        loadApplications();  // Перезагрузить заявки после одобрения
+    } catch (e) {
+        alert("Ошибка при одобрении заявки: " + e.message);
+    }
+}
 
-// Инициализация загрузки данных при старте
-loadRules();
-loadImages();
-loadApplications();
+async function deleteApplication(id) {
+    try {
+        await deleteDoc(doc(db, "applications", id));
+        loadApplications();  // Перезагрузить заявки после удаления
+    } catch (e) {
+        alert("Ошибка при удалении заявки: " + e.message);
+    }
+}
 
-
-
+// Начальная загрузка данных
+document.addEventListener('DOMContentLoaded', () => {
+    loadRules();
+    loadImages();
+    loadApplications();
+});
