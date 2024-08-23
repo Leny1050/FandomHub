@@ -1,9 +1,9 @@
- import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
-   // Firebase конфигурация
+// Firebase конфигурация
 const firebaseConfig = {
     apiKey: "AIzaSyA8NY2vDCOd5ePK5fDMWaMd2JfsRrTabf4",
     authDomain: "flud-73dba.firebaseapp.com",
@@ -30,9 +30,11 @@ const allowedEmails = [
 // Функция для проверки состояния аутентификации
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        document.getElementById('addRuleContainer').style.display = 'block';
-        document.getElementById('pendingContainer').style.display = 'block';
-        document.getElementById('applicationsContainer').style.display = 'block';
+        if (allowedEmails.includes(user.email)) {
+            document.getElementById('addRuleContainer').style.display = 'block';
+            document.getElementById('pendingContainer').style.display = 'block';
+            document.getElementById('applicationsContainer').style.display = 'block';
+        }
         document.getElementById('approvedContainer').style.display = 'block';
         document.getElementById('loginButton').style.display = 'none';
         document.getElementById('logoutButton').style.display = 'inline-block';
@@ -150,12 +152,14 @@ async function loadImages() {
         imageElement.appendChild(img);
 
         if (status === "approved") {
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteImage(doc.id, imageUrl);
-            imageElement.appendChild(deleteButton);  // Добавляем кнопку удаления
+            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Удалить";
+                deleteButton.onclick = () => deleteImage(doc.id, imageUrl);
+                imageElement.appendChild(deleteButton);  // Добавляем кнопку удаления
+            }
             approvedImagesContainer.appendChild(imageElement);
-        } else if (status === "pending" && auth.currentUser) {
+        } else if (status === "pending" && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
             approveButton.onclick = () => approveImage(doc.id, imageUrl);
@@ -204,17 +208,21 @@ async function approveImage(id, url) {
 }
 
 async function deleteImage(id, url) {
-    try {
-        const storageRef = ref(storage, url);
-        await deleteObject(storageRef);
-        await deleteDoc(doc(db, "images", id));
-        loadImages();  // Перезагрузить изображения после удаления
-    } catch (e) {
-        alert("Ошибка при удалении изображения: " + e.message);
+    if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+        try {
+            const storageRef = ref(storage, url);
+            await deleteObject(storageRef);
+            await deleteDoc(doc(db, "images", id));
+            loadImages();  // Перезагрузить изображения после удаления
+        } catch (e) {
+            alert("Ошибка при удалении изображения: " + e.message);
+        }
+    } else {
+        alert("У вас нет прав для удаления этого изображения.");
     }
 }
 
-// Функции для загрузки и управления анкетами
+// Функции для загрузки и управления заявками
 async function loadApplications() {
     const pendingApplicationsContainer = document.getElementById('pendingApplications');
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
@@ -231,7 +239,7 @@ async function loadApplications() {
         const applicationElement = document.createElement('div');
         applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
-        if (status === "pending" && auth.currentUser) {
+        if (status === "pending" && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
             approveButton.onclick = () => approveApplication(doc.id, role, fandom);
@@ -244,33 +252,10 @@ async function loadApplications() {
             applicationElement.appendChild(deleteButton);
             pendingApplicationsContainer.appendChild(applicationElement);
         } else if (status === "approved") {
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteApplication(doc.id);
-
-            applicationElement.appendChild(deleteButton);
             approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
 }
-
-document.getElementById('applicationForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const role = document.getElementById('role').value.trim();
-    const fandom = document.getElementById('fandom').value.trim();
-
-    try {
-        await addDoc(collection(db, "applications"), {
-            role: role,
-            fandom: fandom,
-            status: "pending"
-        });
-        alert("Ваша анкета отправлена и ожидает проверки.");
-        loadApplications();  // Перезагрузить анкеты после отправки
-    } catch (e) {
-        alert("Ошибка при отправке анкеты: " + e.message);
-    }
-});
 
 async function approveApplication(id, role, fandom) {
     try {
@@ -278,17 +263,27 @@ async function approveApplication(id, role, fandom) {
         await updateDoc(applicationRef, {
             status: "approved"
         });
-        loadApplications();  // Перезагрузить анкеты после одобрения
+        loadApplications();  // Перезагрузить заявки после одобрения
     } catch (e) {
-        alert("Ошибка при одобрении анкеты: " + e.message);
+        alert("Ошибка при одобрении заявки: " + e.message);
     }
 }
 
 async function deleteApplication(id) {
-    try {
-        await deleteDoc(doc(db, "applications", id));
-        loadApplications();  // Перезагрузить анкеты после удаления
-    } catch (e) {
-        alert("Ошибка при удалении анкеты: " + e.message);
+    if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+        try {
+            await deleteDoc(doc(db, "applications", id));
+            loadApplications();  // Перезагрузить заявки после удаления
+        } catch (e) {
+            alert("Ошибка при удалении заявки: " + e.message);
+        }
+    } else {
+        alert("У вас нет прав для удаления этой заявки.");
     }
 }
+
+// Инициализация загрузки данных при старте
+loadRules();
+loadImages();
+loadApplications();
+
