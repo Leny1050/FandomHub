@@ -275,3 +275,16 @@ async function deleteApplication(id) {
         alert("Ошибка при удалении анкеты: " + e.message);
     }
 }
+// Обработчики навигации
+document.querySelectorAll('nav a').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1); // Получаем id цели
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth' }); // Плавная прокрутка к секции
+        }
+    });
+});
+
+
