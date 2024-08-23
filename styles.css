@@ -1,19 +1,19 @@
 /* Общие стили */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #121212; /* Темный фон */
+    font-family: 'Arial', sans-serif; /* Простая и современная шрифт */
+    background-color: #181818; /* Темный фон */
     margin: 0;
     padding: 0;
-    color: #e0e0e0; /* Светлый текст */
+    color: #f0f0f0; /* Светлый текст */
     line-height: 1.6;
 }
 
 header {
-    background-color: #1e1e1e; /* Темный фон заголовка */
+    background-color: #242424; /* Темный фон заголовка */
     color: #ffffff;
     padding: 20px 0;
     text-align: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
 }
 
 .header-content {
@@ -36,7 +36,7 @@ p {
 
 /* Кнопки */
 button {
-    background-color: #4CAF50; /* Цвет кнопок */
+    background-color: #6200ea; /* Фиолетовый цвет кнопок */
     color: white;
     border: none;
     padding: 10px 20px;
@@ -48,7 +48,7 @@ button {
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: #3700b3; /* Темный фиолетовый при наведении */
     transform: scale(1.05);
 }
 
@@ -57,17 +57,17 @@ section {
     max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    background-color: #1e1e1e; /* Темный фон для секций */
+    background-color: #2a2a2a; /* Темный фон для секций */
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
 }
 
 /* Заголовки */
 h2 {
     font-size: 1.8rem;
     margin-bottom: 15px;
-    color: #4CAF50; /* Цвет заголовков */
-    border-bottom: 2px solid #4CAF50; /* Подчеркивание */
+    color: #bb86fc; /* Светло-фиолетовый цвет заголовков */
+    border-bottom: 2px solid #6200ea; /* Подчеркивание */
     padding-bottom: 10px;
 }
 
@@ -82,7 +82,7 @@ textarea {
     border-radius: 5px;
     font-size: 1rem;
     transition: border-color 0.3s;
-    background-color: #2a2a2a; /* Темный фон для ввода */
+    background-color: #1c1c1c; /* Темный фон для ввода */
     color: #e0e0e0; /* Светлый текст */
 }
 
@@ -90,12 +90,12 @@ input[type="text"]:focus,
 input[type="file"]:focus,
 textarea:focus {
     outline: none;
-    border-color: #4CAF50; /* Зеленая рамка при фокусе */
+    border-color: #bb86fc; /* Фиолетовая рамка при фокусе */
 }
 
 /* Футер */
 footer {
-    background-color: #1e1e1e; /* Темный фон футера */
+    background-color: #242424; /* Темный фон футера */
     color: #ffffff;
     text-align: center;
     padding: 15px 0;
@@ -107,7 +107,7 @@ footer {
     background-color: #292929; /* Темный фон для правил */
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
 }
 
 .rules {
@@ -212,7 +212,7 @@ footer {
     background-color: #292929; /* Темный фон для анкет */
     padding: 15px;
     border-radius: 5px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
     margin-bottom: 20px;
 }
 
@@ -237,7 +237,7 @@ footer {
 }
 
 .applications-container button:first-child {
-    background-color: #4CAF50; /* Зеленая кнопка */
+    background-color: #6200ea; /* Фиолетовая кнопка */
 }
 
 .applications-container button:hover {
@@ -246,9 +246,9 @@ footer {
 
 /* Навигация */
 nav {
-    background-color: #1e1e1e; /* Темный фон навигации */
+    background-color: #242424; /* Темный фон навигации */
     padding: 10px; /* Отступы */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
 }
 
 nav ul {
@@ -263,11 +263,11 @@ nav li {
 }
 
 nav a {
-    color: #e0e0e0; /* Светлый цвет текста ссылок */
+    color: #bb86fc; /* Светло-фиолетовый цвет текста ссылок */
     text-decoration: none; /* Убираем подчеркивание */
 }
 
 nav a:hover {
-    color: #4CAF50; /* Зеленый цвет при наведении */
+    color: #6200ea; /* Темный фиолетовый при наведении */
     text-decoration: underline; /* Подчеркивание при наведении */
 }
