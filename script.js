@@ -199,12 +199,12 @@ async function deleteImage(id, url) {
     }
 }
 
-// Загрузка анкет из Firestore
+// Функция для загрузки и управления анкетами
 async function loadApplications() {
     const pendingApplicationsContainer = document.getElementById('pendingApplications');
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
-    pendingApplicationsContainer.innerHTML = ""; // Очистить контейнер для ожидающих анкет
-    approvedApplicationsContainer.innerHTML = ""; // Очистить контейнер для одобренных анкет
+    pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
+    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
 
     const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
@@ -212,10 +212,23 @@ async function loadApplications() {
         const applicationElement = document.createElement('div');
         applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
+        if (status === "approved") {
+            approvedApplicationsContainer.appendChild(applicationElement);
+
+            // Если текущий пользователь админ, добавляем кнопку удаления
+            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Удалить";
+                deleteButton.onclick = () => deleteApplication(doc.id);
+                applicationElement.appendChild(deleteButton);
+            }
+        }
+
+        // Заявки на рассмотрении видны только админам
         if (status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
-            approveButton.onclick = () => approveApplication(doc.id);
+            approveButton.onclick = () => approveApplication(doc.id, role, fandom);
 
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Удалить";
@@ -224,50 +237,49 @@ async function loadApplications() {
             applicationElement.appendChild(approveButton);
             applicationElement.appendChild(deleteButton);
             pendingApplicationsContainer.appendChild(applicationElement);
-        } else if (status === "approved") {
-            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = "Удалить";
-                deleteButton.onclick = () => deleteApplication(doc.id);
-                applicationElement.appendChild(deleteButton);
-            }
-            approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
 }
 
-// Отправка анкеты
+// Функция для отправки анкеты
 document.getElementById('applicationForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const role = document.getElementById('role').value.trim();
     const fandom = document.getElementById('fandom').value.trim();
 
     try {
-        await addDoc(collection(db, "applications"), { role, fandom, status: "pending" });
+        await addDoc(collection(db, "applications"), {
+            role: role,
+            fandom: fandom,
+            status: "pending"
+        });
         alert("Ваша анкета отправлена и ожидает проверки.");
-        loadApplications(); // Перезагрузить анкеты после отправки
-    } catch (error) {
-        alert("Ошибка при отправке анкеты: " + error.message);
+        loadApplications();  // Перезагрузить анкеты после отправки
+    } catch (e) {
+        alert("Ошибка при отправке анкеты: " + e.message);
     }
 });
 
-// Одобрение анкеты
+// Функция для одобрения анкеты
 async function approveApplication(id) {
     try {
         const applicationRef = doc(db, "applications", id);
-        await updateDoc(applicationRef, { status: "approved" });
-        loadApplications(); // Перезагрузить анкеты после одобрения
-    } catch (error) {
-        alert("Ошибка при одобрении анкеты: " + error.message);
+        await updateDoc(applicationRef, {
+            status: "approved"
+        });
+        loadApplications();  // Перезагрузить анкеты после одобрения
+    } catch (e) {
+        alert("Ошибка при одобрении анкеты: " + e.message);
     }
 }
 
-// Удаление анкеты
+// Функция для удаления анкеты
 async function deleteApplication(id) {
     try {
         await deleteDoc(doc(db, "applications", id));
-        loadApplications(); // Перезагрузить анкеты после удаления
-    } catch (error) {
-        alert("Ошибка при удалении анкеты: " + error.message);
+        loadApplications();  // Перезагрузить анкеты после удаления
+    } catch (e) {
+        alert("Ошибка при удалении анкеты: " + e.message);
     }
 }
+
