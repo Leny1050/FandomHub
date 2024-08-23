@@ -19,14 +19,24 @@
             <button id="logoutButton" style="display: none;">Выйти</button>
         </div>
     </div>
+    
+    <!-- Навигационное меню -->
+    <nav>
+        <ul>
+            <li><a href="#rules">Правила</a></li>
+            <li><a href="#images">Изображения</a></li>
+            <li><a href="#applications">Анкеты</a></li>
+            <li><a href="#contact">Контакты</a></li>
+        </ul>
+    </nav>
 </header>
 
 <!-- Секция с правилами -->
-<section class="rules-section">
+<section class="rules-section" id="rules">
     <div class="rules-container">
         <h2>Правила Чата</h2>
         <ul id="rules" class="rules">
-            <li>Загрузка правил... если не открывается нажмите "Версия для ПК"</li>
+            <li>Загрузка правил... если не открывается, нажмите "Версия для ПК"</li>
         </ul>
     </div>
 
@@ -40,7 +50,7 @@
 </section>
 
 <!-- Новая секция для загрузки изображений -->
-<section class="image-section">
+<section class="image-section" id="images">
     <h2>Загрузить изображение</h2>
     <input type="file" id="imageUpload" accept="image/*">
     <button id="uploadImageButton">Загрузить</button>
@@ -55,7 +65,7 @@
 </section>
 
 <!-- Секция для анкет на вступление -->
-<section class="application-section">
+<section class="application-section" id="applications">
     <h2>Отправить анкету на вступление</h2>
     <form id="applicationForm">
         <label for="role">На какую роль? и ваш юз тг</label><br>
