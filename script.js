@@ -226,10 +226,12 @@ async function deleteImage(id, url) {
 async function loadApplications() {
     const pendingApplicationsContainer = document.getElementById('pendingApplications');
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
+    
     pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
     approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
 
     const querySnapshot = await getDocs(collection(db, "applications"));
+    
     querySnapshot.forEach((doc) => {
         const application = doc.data();
         const role = application.role;
@@ -239,18 +241,20 @@ async function loadApplications() {
         const applicationElement = document.createElement('div');
         applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
-        if (status === "pending" && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-            const approveButton = document.createElement('button');
-            approveButton.textContent = "Одобрить";
-            approveButton.onclick = () => approveApplication(doc.id, role, fandom);
+        if (status === "pending") {
+            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+                const approveButton = document.createElement('button');
+                approveButton.textContent = "Одобрить";
+                approveButton.onclick = () => approveApplication(doc.id, role, fandom);
 
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteApplication(doc.id);
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Удалить";
+                deleteButton.onclick = () => deleteApplication(doc.id);
 
-            applicationElement.appendChild(approveButton);
-            applicationElement.appendChild(deleteButton);
-            pendingApplicationsContainer.appendChild(applicationElement);
+                applicationElement.appendChild(approveButton);
+                applicationElement.appendChild(deleteButton);
+                pendingApplicationsContainer.appendChild(applicationElement);
+            }
         } else if (status === "approved") {
             approvedApplicationsContainer.appendChild(applicationElement);
             if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
@@ -263,30 +267,6 @@ async function loadApplications() {
     });
 }
 
-async function approveApplication(id, role, fandom) {
-    try {
-        const applicationRef = doc(db, "applications", id);
-        await updateDoc(applicationRef, {
-            status: "approved"
-        });
-        loadApplications();  // Перезагрузить заявки после одобрения
-    } catch (e) {
-        alert("Ошибка при одобрении заявки: " + e.message);
-    }
-}
-
-async function deleteApplication(id) {
-    if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-        try {
-            await deleteDoc(doc(db, "applications", id));
-            loadApplications();  // Перезагрузить заявки после удаления
-        } catch (e) {
-            alert("Ошибка при удалении заявки: " + e.message);
-        }
-    } else {
-        alert("У вас нет прав для удаления этой заявки.");
-    }
-}
 
 // Инициализация загрузки данных при старте
 loadRules();
