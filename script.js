@@ -77,36 +77,28 @@ async function loadRules() {
     const rulesContainer = document.getElementById('rules');
     rulesContainer.innerHTML = "";  // Очистить контейнер
 
-    const uniqueRules = new Set(); // Используем Set для отслеживания уникальных ролей
-
     querySnapshot.forEach((doc) => {
         const rule = doc.data().text;
+        const ruleElement = document.createElement('li');
+        ruleElement.classList.add('rule-item');
 
-        // Добавляем роль в Set, если её там ещё нет
-        if (!uniqueRules.has(rule)) {
-            uniqueRules.add(rule);
+        const ruleText = document.createElement('p');
+        ruleText.textContent = rule;
 
-            const ruleElement = document.createElement('li');
-            ruleElement.classList.add('rule-item');
+        // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
+        if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.classList.add('delete-button');
+            deleteButton.onclick = () => deleteRule(doc.id);
 
-            const ruleText = document.createElement('p');
-            ruleText.textContent = rule;
-
-            // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
-            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = "Удалить";
-                deleteButton.classList.add('delete-button');
-                deleteButton.onclick = () => deleteRule(doc.id);
-
-                ruleElement.appendChild(ruleText);
-                ruleElement.appendChild(deleteButton);
-            } else {
-                ruleElement.appendChild(ruleText);
-            }
-
-            rulesContainer.appendChild(ruleElement);
+            ruleElement.appendChild(ruleText);
+            ruleElement.appendChild(deleteButton);
+        } else {
+            ruleElement.appendChild(ruleText);
         }
+
+        rulesContainer.appendChild(ruleElement);
     });
 }
 
@@ -117,24 +109,11 @@ async function addRule() {
     // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
     if (newRuleText && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
         try {
-            const querySnapshot = await getDocs(collection(db, "rules"));
-            let isDuplicate = false;
-
-            querySnapshot.forEach((doc) => {
-                if (doc.data().text === newRuleText) {
-                    isDuplicate = true;
-                }
+            await addDoc(collection(db, "rules"), {
+                text: newRuleText
             });
-
-            if (isDuplicate) {
-                alert("Такая роль уже существует!");
-            } else {
-                await addDoc(collection(db, "rules"), {
-                    text: newRuleText
-                });
-                newRuleInput.value = "";  // Очистить поле ввода
-                loadRules();  // Перезагрузить правила
-            }
+            newRuleInput.value = "";  // Очистить поле ввода
+            loadRules();  // Перезагрузить правила
         } catch (e) {
             alert("Ошибка при добавлении правила: " + e.message);
         }
@@ -207,6 +186,7 @@ document.getElementById('uploadImageButton').addEventListener('click', async () 
             url: url,
             status: "pending"
         });
+        alert("Изображение загружено и ожидает проверки.");
         loadImages();  // Перезагрузить изображения после загрузки
     } catch (e) {
         alert("Ошибка при загрузке изображения: " + e.message);
@@ -244,8 +224,6 @@ async function loadApplications() {
     pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
     approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
 
-    const uniqueRoles = new Set(); // Используем Set для отслеживания уникальных ролей
-
     const querySnapshot = await getDocs(collection(db, "applications"));
     
     querySnapshot.forEach((doc) => {
@@ -254,33 +232,31 @@ async function loadApplications() {
         const fandom = application.fandom;
         const status = application.status;  // "pending" или "approved"
 
-        if (!uniqueRoles.has(role)) {
-            uniqueRoles.add(role);
+        const applicationElement = document.createElement('div');
+        applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
-            const applicationElement = document.createElement('div');
-            applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
+        if (status === "pending") {
+            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+                const approveButton = document.createElement('button');
+                approveButton.textContent = "Одобрить";
+                approveButton.onclick = () => approveApplication(doc.id, role, fandom);
 
-            if (status === "pending") {
-                if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-                    const approveButton = document.createElement('button');
-                    approveButton.textContent = "Одобрить";
-                    approveButton.onclick = () => approveApplication(doc.id, role, fandom);
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Удалить";
+                deleteButton.onclick = () => deleteApplication(doc.id);
 
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = "Удалить";
-                    deleteButton.onclick = () => deleteApplication(doc.id);
-
-                    applicationElement.appendChild(approveButton);
-                    applicationElement.appendChild(deleteButton);
-                    pendingApplicationsContainer.appendChild(applicationElement);
-                }
-            } else if (status === "approved") {
-                const approvedText = document.createElement('span');
-                approvedText.textContent = ` (Занята)`;
-                applicationElement.appendChild(approvedText);
-
-                approvedApplicationsContainer.appendChild(applicationElement);
+                applicationElement.appendChild(approveButton);
+                applicationElement.appendChild(deleteButton);
+                pendingApplicationsContainer.appendChild(applicationElement);
             }
+        } else if (status === "approved") {
+            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Удалить";
+                deleteButton.onclick = () => deleteApplication(doc.id);
+                applicationElement.appendChild(deleteButton); // Добавить кнопку удаления только для админов
+            }
+            approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
 }
