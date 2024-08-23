@@ -275,16 +275,43 @@ async function deleteApplication(id) {
         alert("Ошибка при удалении анкеты: " + e.message);
     }
 }
-// Обработчики навигации
-document.querySelectorAll('nav a').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href').substring(1); // Получаем id цели
-        const targetElement = document.getElementById(targetId);
-        if (targetElement) {
-            targetElement.scrollIntoView({ behavior: 'smooth' }); // Плавная прокрутка к секции
-        }
-    });
+// Функция для переключения между разделами
+function showSection(section) {
+    document.getElementById('rulesContainer').style.display = 'none';
+    document.getElementById('imagesContainer').style.display = 'none';
+    document.getElementById('applicationsContainer').style.display = 'none';
+
+    if (section === 'rules') {
+        document.getElementById('rulesContainer').style.display = 'block';
+        loadRules(); // Загружать правила при открытии раздела
+    } else if (section === 'images') {
+        document.getElementById('imagesContainer').style.display = 'block';
+        loadImages(); // Загружать изображения при открытии раздела
+    } else if (section === 'applications') {
+        document.getElementById('applicationsContainer').style.display = 'block';
+        loadApplications(); // Загружать анкеты при открытии раздела
+    }
+}
+
+// Добавляем обработчики событий для навигации
+document.getElementById('homeLink').addEventListener('click', () => {
+    showSection('home'); // Опционально, если у вас есть главная страница
 });
+
+document.getElementById('rulesLink').addEventListener('click', () => {
+    showSection('rules');
+});
+
+document.getElementById('imagesLink').addEventListener('click', () => {
+    showSection('images');
+});
+
+document.getElementById('applicationsLink').addEventListener('click', () => {
+    showSection('applications');
+});
+
+// Инициализируем отображение первой секции
+showSection('rules'); // Показывать правила по умолчанию при загрузке страницы
+
 
 
