@@ -249,3 +249,28 @@ footer {
 .applications-container button:hover {
     background-color: #d32f2f;
 }
+nav {
+    background-color: #333; /* Цвет фона навигации */
+    padding: 10px; /* Отступы */
+}
+
+nav ul {
+    list-style: none; /* Убираем маркеры списка */
+    padding: 0; /* Убираем отступы */
+    margin: 0; /* Убираем внешние отступы */
+    display: flex; /* Используем флекс для горизонтального расположения элементов */
+}
+
+nav li {
+    margin-right: 20px; /* Отступы между элементами */
+}
+
+nav a {
+    color: white; /* Цвет текста ссылок */
+    text-decoration: none; /* Убираем подчеркивание */
+}
+
+nav a:hover {
+    text-decoration: underline; /* Подчеркивание при наведении */
+}
+
