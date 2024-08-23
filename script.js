@@ -1,9 +1,10 @@
+// Импорт необходимых модулей Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
-// Firebase configuration
+// Конфигурация Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyA8NY2vDCOd5ePK5fDMWaMd2JfsRrTabf4",
     authDomain: "flud-73dba.firebaseapp.com",
@@ -14,20 +15,20 @@ const firebaseConfig = {
     measurementId: "G-C2VRPHPDRG"
 };
 
-// Initialize Firebase
+// Инициализация Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 
-// Array of allowed email addresses
+// Массив разрешенных адресов электронной почты
 const allowedEmails = [
     "wulk741852963@gmail.com",
     "101010tatata1010@gmail.com",
     "fludvsefd500@gmail.com"
 ];
 
-// Authentication state change listener
+// Слушатель изменений состояния аутентификации
 onAuthStateChanged(auth, (user) => {
     toggleUI(user);
     loadRules();
@@ -35,7 +36,7 @@ onAuthStateChanged(auth, (user) => {
     loadApplications();
 });
 
-// Toggle UI based on authentication state
+// Функция переключения интерфейса в зависимости от состояния аутентификации
 function toggleUI(user) {
     const isAuthenticated = !!user;
     document.getElementById('addRuleContainer').style.display = isAuthenticated ? 'block' : 'none';
@@ -46,7 +47,7 @@ function toggleUI(user) {
     document.getElementById('logoutButton').style.display = isAuthenticated ? 'inline-block' : 'none';
 }
 
-// User login
+// Вход пользователя
 document.getElementById('loginButton').addEventListener('click', async () => {
     const email = prompt("Введите ваш email:");
     const password = prompt("Введите ваш пароль:");
@@ -58,7 +59,7 @@ document.getElementById('loginButton').addEventListener('click', async () => {
     }
 });
 
-// User logout
+// Выход пользователя
 document.getElementById('logoutButton').addEventListener('click', async () => {
     try {
         await signOut(auth);
@@ -68,11 +69,11 @@ document.getElementById('logoutButton').addEventListener('click', async () => {
     }
 });
 
-// Load rules from Firestore
+// Загрузка правил из Firestore
 async function loadRules() {
     const querySnapshot = await getDocs(collection(db, "rules"));
     const rulesContainer = document.getElementById('rules');
-    rulesContainer.innerHTML = ""; // Clear container
+    rulesContainer.innerHTML = ""; // Очистить контейнер
 
     querySnapshot.forEach((doc) => {
         const rule = doc.data().text;
@@ -92,7 +93,7 @@ async function loadRules() {
     });
 }
 
-// Add a new rule
+// Добавление нового правила
 document.getElementById('addRuleButton').addEventListener('click', addRule);
 async function addRule() {
     const newRuleInput = document.getElementById('new-rule');
@@ -101,8 +102,8 @@ async function addRule() {
     if (newRuleText && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
         try {
             await addDoc(collection(db, "rules"), { text: newRuleText });
-            newRuleInput.value = ""; // Clear input
-            loadRules(); // Reload rules
+            newRuleInput.value = ""; // Очистить поле ввода
+            loadRules(); // Перезагрузить правила
         } catch (error) {
             alert("Ошибка при добавлении правила: " + error.message);
         }
@@ -111,22 +112,22 @@ async function addRule() {
     }
 }
 
-// Delete a rule
+// Удаление правила
 async function deleteRule(id) {
     try {
         await deleteDoc(doc(db, "rules", id));
-        loadRules(); // Reload rules after deletion
+        loadRules(); // Перезагрузить правила после удаления
     } catch (error) {
         alert("Ошибка при удалении правила: " + error.message);
     }
 }
 
-// Load images from Firestore
+// Загрузка изображений из Firestore
 async function loadImages() {
     const approvedImagesContainer = document.getElementById('approvedImages');
     const pendingImagesContainer = document.getElementById('pendingImages');
-    approvedImagesContainer.innerHTML = ""; // Clear container for approved images
-    pendingImagesContainer.innerHTML = ""; // Clear container for pending images
+    approvedImagesContainer.innerHTML = ""; // Очистить контейнер для одобренных изображений
+    pendingImagesContainer.innerHTML = ""; // Очистить контейнер для ожидающих изображений
 
     const querySnapshot = await getDocs(collection(db, "images"));
     querySnapshot.forEach((doc) => {
@@ -158,7 +159,7 @@ async function loadImages() {
     });
 }
 
-// Upload an image
+// Загрузка изображения
 document.getElementById('uploadImageButton').addEventListener('click', async () => {
     const fileInput = document.getElementById('imageUpload');
     const file = fileInput.files[0];
@@ -170,30 +171,30 @@ document.getElementById('uploadImageButton').addEventListener('click', async () 
         const url = await getDownloadURL(storageRef);
         await addDoc(collection(db, "images"), { url: url, status: "pending" });
         alert("Изображение загружено и ожидает проверки.");
-        loadImages(); // Reload images after upload
+        loadImages(); // Перезагрузить изображения после загрузки
     } catch (error) {
         alert("Ошибка при загрузке изображения: " + error.message);
     }
 });
 
-// Approve an image
+// Одобрение изображения
 async function approveImage(id) {
     try {
         const imageRef = doc(db, "images", id);
         await updateDoc(imageRef, { status: "approved" });
-        loadImages(); // Reload images after approval
+        loadImages(); // Перезагрузить изображения после одобрения
     } catch (error) {
         alert("Ошибка при одобрении изображения: " + error.message);
     }
 }
 
-// Delete an image
+// Удаление изображения
 async function deleteImage(id, url) {
     try {
         const storageRef = ref(storage, url);
         await deleteObject(storageRef);
         await deleteDoc(doc(db, "images", id));
-        loadImages(); // Reload images after deletion
+        loadImages(); // Перезагрузить изображения после удаления
     } catch (error) {
         alert("Ошибка при удалении изображения: " + error.message);
     }
@@ -204,7 +205,7 @@ async function loadApplications() {
     const pendingApplicationsContainer = document.getElementById('pendingApplications');
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
     pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
-    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
+    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для одобренных анкет
 
     const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
@@ -215,7 +216,7 @@ async function loadApplications() {
         if (status === "approved") {
             approvedApplicationsContainer.appendChild(applicationElement);
 
-            // Если текущий пользователь админ, добавляем кнопку удаления
+            // Если текущий пользователь админ, добавляем кнопку удаления```javascript
             if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = "Удалить";
