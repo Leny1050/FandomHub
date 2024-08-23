@@ -82,6 +82,7 @@ async function loadRules() {
     querySnapshot.forEach((doc) => {
         const rule = doc.data().text;
 
+        // Добавляем роль в Set, если её там ещё нет
         if (!uniqueRules.has(rule)) {
             uniqueRules.add(rule);
 
@@ -206,7 +207,6 @@ document.getElementById('uploadImageButton').addEventListener('click', async () 
             url: url,
             status: "pending"
         });
-        alert("Изображение загружено и ожидает проверки.");
         loadImages();  // Перезагрузить изображения после загрузки
     } catch (e) {
         alert("Ошибка при загрузке изображения: " + e.message);
@@ -275,12 +275,10 @@ async function loadApplications() {
                     pendingApplicationsContainer.appendChild(applicationElement);
                 }
             } else if (status === "approved") {
-                if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-                    const deleteButton = document.createElement('button');
-                    deleteButton.textContent = "Удалить";
-                    deleteButton.onclick = () => deleteApplication(doc.id);
-                    applicationElement.appendChild(deleteButton); // Добавить кнопку удаления только для админов
-                }
+                const approvedText = document.createElement('span');
+                approvedText.textContent = ` (Занята)`;
+                applicationElement.appendChild(approvedText);
+
                 approvedApplicationsContainer.appendChild(applicationElement);
             }
         }
