@@ -3,7 +3,7 @@ import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } 
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
-// Конфигурация Firebase
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyA8NY2vDCOd5ePK5fDMWaMd2JfsRrTabf4",
     authDomain: "flud-73dba.firebaseapp.com",
@@ -14,30 +14,30 @@ const firebaseConfig = {
     measurementId: "G-C2VRPHPDRG"
 };
 
-// Инициализация Firebase
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 
-// Массив разрешенных адресов электронной почты
+// Array of allowed email addresses
 const allowedEmails = [
     "wulk741852963@gmail.com",
     "101010tatata1010@gmail.com",
     "fludvsefd500@gmail.com"
 ];
 
-// Слушатель изменения состояния аутентификации
+// Authentication state change listener
 onAuthStateChanged(auth, (user) => {
-    toggleUI(user); // Переключение интерфейса в зависимости от состояния аутентификации
-    loadRules(); // Загрузка правил
-    loadImages(); // Загрузка изображений
-    loadApplications(); // Загрузка анкет
+    toggleUI(user);
+    loadRules();
+    loadImages();
+    loadApplications();
 });
 
-// Функция для переключения интерфейса в зависимости от состояния аутентификации
+// Toggle UI based on authentication state
 function toggleUI(user) {
-    const isAuthenticated = !!user; // Проверка, вошел ли пользователь в систему
+    const isAuthenticated = !!user;
     document.getElementById('addRuleContainer').style.display = isAuthenticated ? 'block' : 'none';
     document.getElementById('pendingContainer').style.display = isAuthenticated ? 'block' : 'none';
     document.getElementById('applicationsContainer').style.display = isAuthenticated ? 'block' : 'none';
@@ -46,160 +46,156 @@ function toggleUI(user) {
     document.getElementById('logoutButton').style.display = isAuthenticated ? 'inline-block' : 'none';
 }
 
-// Вход пользователя
+// User login
 document.getElementById('loginButton').addEventListener('click', async () => {
-    const email = prompt("Введите ваш email:"); // Запрос email у пользователя
-    const password = prompt("Введите ваш пароль:"); // Запрос пароля у пользователя
+    const email = prompt("Введите ваш email:");
+    const password = prompt("Введите ваш пароль:");
     try {
-        await signInWithEmailAndPassword(auth, email, password); // Аутентификация пользователя
-        alert("Вы успешно вошли в систему!"); // Успешное уведомление
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Вы успешно вошли в систему!");
     } catch (error) {
-        alert("Ошибка при входе: " + error.message); // Ошибка при аутентификации
+        alert("Ошибка при входе: " + error.message);
     }
 });
 
-// Выход пользователя
+// User logout
 document.getElementById('logoutButton').addEventListener('click', async () => {
     try {
-        await signOut(auth); // Выход пользователя
-        alert("Вы вышли из системы."); // Уведомление о выходе
+        await signOut(auth);
+        alert("Вы вышли из системы.");
     } catch (error) {
-        alert("Ошибка при выходе: " + error.message); // Ошибка при выходе
+        alert("Ошибка при выходе: " + error.message);
     }
 });
 
-// Загрузка правил из Firestore
+// Load rules from Firestore
 async function loadRules() {
-    const querySnapshot = await getDocs(collection(db, "rules")); // Получение документов из коллекции "rules"
+    const querySnapshot = await getDocs(collection(db, "rules"));
     const rulesContainer = document.getElementById('rules');
-    rulesContainer.innerHTML = ""; // Очистка контейнера
+    rulesContainer.innerHTML = ""; // Clear container
 
     querySnapshot.forEach((doc) => {
-        const rule = doc.data().text; // Получение текста правила
-        const ruleElement = document.createElement('li'); // Создание элемента списка для правила
+        const rule = doc.data().text;
+        const ruleElement = document.createElement('li');
         ruleElement.classList.add('rule-item');
-        ruleElement.textContent = rule; // Установка текста правила
+        ruleElement.textContent = rule;
 
-        // Если пользователь администратор, добавляем кнопку удаления
         if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-            const deleteButton = document.createElement('button'); // Создание кнопки удаления
-            deleteButton.textContent = "Удалить"; // Текст кнопки
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
             deleteButton.classList.add('delete-button');
-            deleteButton.onclick = () => deleteRule(doc.id); // Установка функции удаления правила
+            deleteButton.onclick = () => deleteRule(doc.id);
             ruleElement.appendChild(deleteButton);
         }
 
-        rulesContainer.appendChild(ruleElement); // Добавление правила в контейнер
+        rulesContainer.appendChild(ruleElement);
     });
 }
 
-// Добавление нового правила
+// Add a new rule
 document.getElementById('addRuleButton').addEventListener('click', addRule);
 async function addRule() {
-    const newRuleInput = document.getElementById('new-rule'); // Получение элемента ввода нового правила
-    const newRuleText = newRuleInput.value.trim(); // Получение и обрезка текста нового правила
+    const newRuleInput = document.getElementById('new-rule');
+    const newRuleText = newRuleInput.value.trim();
 
-    // Проверка на наличие текста правила и соответствие пользователя разрешенному списку
     if (newRuleText && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
         try {
-            await addDoc(collection(db, "rules"), { text: newRuleText }); // Добавление нового правила в Firestore
-            newRuleInput.value = ""; // Очистка ввода
-            loadRules(); // Перезагрузка правил
+            await addDoc(collection(db, "rules"), { text: newRuleText });
+            newRuleInput.value = ""; // Clear input
+            loadRules(); // Reload rules
         } catch (error) {
-            alert("Ошибка при добавлении правила: " + error.message); // Ошибка при добавлении правила
+            alert("Ошибка при добавлении правила: " + error.message);
         }
     } else {
-        alert("Пожалуйста, войдите в систему с разрешенным адресом электронной почты для добавления правила."); // Уведомление об ошибке
+        alert("Пожалуйста, войдите в систему с разрешенным адресом электронной почты для добавления правила.");
     }
 }
 
-// Удаление правила
+// Delete a rule
 async function deleteRule(id) {
     try {
-        await deleteDoc(doc(db, "rules", id)); // Удаление документа правила из Firestore
-        loadRules(); // Перезагрузка правил после удаления
+        await deleteDoc(doc(db, "rules", id));
+        loadRules(); // Reload rules after deletion
     } catch (error) {
-        alert("Ошибка при удалении правила: " + error.message); // Ошибка при удалении правила
+        alert("Ошибка при удалении правила: " + error.message);
     }
 }
 
-// Загрузка изображений из Firestore
+// Load images from Firestore
 async function loadImages() {
     const approvedImagesContainer = document.getElementById('approvedImages');
     const pendingImagesContainer = document.getElementById('pendingImages');
-    approvedImagesContainer.innerHTML = ""; // Очистка контейнера для одобренных изображений
-    pendingImagesContainer.innerHTML = ""; // Очистка контейнера для ожидающих изображений
+    approvedImagesContainer.innerHTML = ""; // Clear container for approved images
+    pendingImagesContainer.innerHTML = ""; // Clear container for pending images
 
-    const querySnapshot = await getDocs(collection(db, "images")); // Получение изображений из коллекции "images"
+    const querySnapshot = await getDocs(collection(db, "images"));
     querySnapshot.forEach((doc) => {
-        const { url, status } = doc.data(); // Получение URL и статуса изображения
-        const imageElement = document.createElement('div'); // Создание контейнера для изображения
-        const img = document.createElement('img'); // Создание элемента изображения
-        img.src = url; // Установка источника изображения
+        const { url, status } = doc.data();
+        const imageElement = document.createElement('div');
+        const img = document.createElement('img');
+        img.src = url;
         imageElement.appendChild(img);
 
-        // Обработка одобренных изображений
         if (status === "approved") {
-            const deleteButton = document.createElement('button'); // Создание кнопки удаления
-            deleteButton.textContent = "Удалить"; // Текст кнопки
-            deleteButton.onclick = () => deleteImage(doc.id, url); // Установка функции удаления изображения
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.onclick = () => deleteImage(doc.id, url);
             imageElement.appendChild(deleteButton);
-            approvedImagesContainer.appendChild(imageElement); // Добавление изображения в контейнер одобренных
+            approvedImagesContainer.appendChild(imageElement);
         } else if (status === "pending" && auth.currentUser) {
-            const approveButton = document.createElement('button'); // Создание кнопки одобрения
-            approveButton.textContent = "Одобрить"; // Текст кнопки
-            approveButton.onclick = () => approveImage(doc.id); // Установка функции одобрения изображения
+            const approveButton = document.createElement('button');
+            approveButton.textContent = "Одобрить";
+            approveButton.onclick = () => approveImage(doc.id);
 
-            const deleteButton = document.createElement('button'); // Создание кнопки удаления
-            deleteButton.textContent = "Удалить"; // Текст кнопки
-            deleteButton.onclick = () => deleteImage(doc.id, url); // Установка функции удаления изображения
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.onclick = () => deleteImage(doc.id, url);
 
-            imageElement.appendChild(approveButton); // Добавление кнопки одобрения
-            imageElement.appendChild(deleteButton); // Добавление кнопки удаления
-            pendingImagesContainer.appendChild(imageElement); // Добавление изображения в контейнер ожидающих
+            imageElement.appendChild(approveButton);
+            imageElement.appendChild(deleteButton);
+            pendingImagesContainer.appendChild(imageElement);
         }
     });
 }
 
-// Загрузка изображения
+// Upload an image
 document.getElementById('uploadImageButton').addEventListener('click', async () => {
-    const fileInput = document.getElementById('imageUpload'); // Получение элемента загрузки файла
-    const file = fileInput.files[0]; // Получение файла
-    if (!file) return; // Если файла нет, выход
+    const fileInput = document.getElementById('imageUpload');
+    const file = fileInput.files[0];
+    if (!file) return;
 
-    const storageRef = ref(storage, 'images/' + file.name); // Ссылка на хранилище для загрузки изображения
-   ```javascript
+    const storageRef = ref(storage, 'images/' + file.name);
     try {
-        await uploadBytes(storageRef, file); // Загрузка файла в хранилище
-        const url = await getDownloadURL(storageRef); // Получение URL загруженного изображения
-        await addDoc(collection(db, "images"), { url: url, status: "pending" }); // Добавление изображения в Firestore со статусом "ожидание"
-        alert("Изображение загружено и ожидает проверки."); // Уведомление о загрузке изображения
-        loadImages(); // Перезагрузка изображений после загрузки
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        await addDoc(collection(db, "images"), { url: url, status: "pending" });
+        alert("Изображение загружено и ожидает проверки.");
+        loadImages(); // Reload images after upload
     } catch (error) {
-        alert("Ошибка при загрузке изображения: " + error.message); // Ошибка при загрузке изображения
+        alert("Ошибка при загрузке изображения: " + error.message);
     }
 });
 
-// Одобрение изображения
+// Approve an image
 async function approveImage(id) {
     try {
-        const imageRef = doc(db, "images", id); // Получение ссылки на документ изображения
-        await updateDoc(imageRef, { status: "approved" }); // Обновление статуса изображения на "одобрено"
-        loadImages(); // Перезагрузка изображений после одобрения
+        const imageRef = doc(db, "images", id);
+        await updateDoc(imageRef, { status: "approved" });
+        loadImages(); // Reload images after approval
     } catch (error) {
-        alert("Ошибка при одобрении изображения: " + error.message); // Ошибка при одобрении изображения
+        alert("Ошибка при одобрении изображения: " + error.message);
     }
 }
 
-// Удаление изображения
+// Delete an image
 async function deleteImage(id, url) {
     try {
-        const storageRef = ref(storage, url); // Получение ссылки на изображение в хранилище
-        await deleteObject(storageRef); // Удаление изображения из хранилища
-        await deleteDoc(doc(db, "images", id)); // Удаление документа изображения из Firestore
-        loadImages(); // Перезагрузка изображений после удаления
+        const storageRef = ref(storage, url);
+        await deleteObject(storageRef);
+        await deleteDoc(doc(db, "images", id));
+        loadImages(); // Reload images after deletion
     } catch (error) {
-        alert("Ошибка при удалении изображения: " + error.message); // Ошибка при удалении изображения
+        alert("Ошибка при удалении изображения: " + error.message);
     }
 }
 
@@ -208,82 +204,81 @@ async function loadApplications() {
     const pendingApplicationsContainer = document.getElementById('pendingApplications');
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
     pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
-    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для одобренных анкет
+    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
 
-    const querySnapshot = await getDocs(collection(db, "applications")); // Получение анкет из Firestore
+    const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
-        const { role, fandom, status } = doc.data(); // Получение данных анкеты
-        const applicationElement = document.createElement('div'); // Создание элемента для анкеты
-        applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`; // Установка текста анкеты
+        const { role, fandom, status } = doc.data();
+        const applicationElement = document.createElement('div');
+        applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
-        // Обработка одобренных анкет
         if (status === "approved") {
-            approvedApplicationsContainer.appendChild(applicationElement); // Добавление одобренной анкеты в контейнер
+            approvedApplicationsContainer.appendChild(applicationElement);
 
-            // Если текущий пользователь администратор, добавляем кнопку удаления
+            // Если текущий пользователь админ, добавляем кнопку удаления
             if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-                const deleteButton = document.createElement('button'); // Создание кнопки удаления
-                deleteButton.textContent = "Удалить"; // Текст кнопки
-                deleteButton.onclick = () => deleteApplication(doc.id); // Установка функции удаления анкеты
-                applicationElement.appendChild(deleteButton); // Добавление кнопки в элемент анкеты
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Удалить";
+                deleteButton.onclick = () => deleteApplication(doc.id);
+                applicationElement.appendChild(deleteButton);
             }
         }
 
         // Заявки на рассмотрении видны только админам
         if (status === "pending" && auth.currentUser) {
-            const approveButton = document.createElement('button'); // Создание кнопки одобрения
-            approveButton.textContent = "Одобрить"; // Текст кнопки
-            approveButton.onclick = () => approveApplication(doc.id, role, fandom); // Установка функции одобрения анкеты
+            const approveButton = document.createElement('button');
+            approveButton.textContent = "Одобрить";
+            approveButton.onclick = () => approveApplication(doc.id, role, fandom);
 
-            const deleteButton = document.createElement('button'); // Создание кнопки удаления
-            deleteButton.textContent = "Удалить"; // Текст кнопки
-            deleteButton.onclick = () => deleteApplication(doc.id); // Установка функции удаления анкеты
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.onclick = () => deleteApplication(doc.id);
 
-            applicationElement.appendChild(approveButton); // Добавление кнопки одобрения
-            applicationElement.appendChild(deleteButton); // Добавление кнопки удаления
-            pendingApplicationsContainer.appendChild(applicationElement); // Добавление анкеты в контейнер ожидающих
+            applicationElement.appendChild(approveButton);
+            applicationElement.appendChild(deleteButton);
+            pendingApplicationsContainer.appendChild(applicationElement);
         }
     });
 }
 
 // Функция для отправки анкеты
 document.getElementById('applicationForm').addEventListener('submit', async (e) => {
-    e.preventDefault(); // Предотвращение перезагрузки страницы
-    const role = document.getElementById('role').value.trim(); // Получение роли из формы
-    const fandom = document.getElementById('fandom').value.trim(); // Получение фандома из формы
+    e.preventDefault();
+    const role = document.getElementById('role').value.trim();
+    const fandom = document.getElementById('fandom').value.trim();
 
     try {
         await addDoc(collection(db, "applications"), {
             role: role,
             fandom: fandom,
-            status: "pending" // Установка статуса анкеты на "ожидание"
+            status: "pending"
         });
-        alert("Ваша анкета отправлена и ожидает проверки."); // Уведомление об успешной отправке анкеты
-        loadApplications();  // Перезагрузка анкет после отправки
+        alert("Ваша анкета отправлена и ожидает проверки.");
+        loadApplications();  // Перезагрузить анкеты после отправки
     } catch (e) {
-        alert("Ошибка при отправке анкеты: " + e.message); // Ошибка при отправке анкеты
+        alert("Ошибка при отправке анкеты: " + e.message);
     }
 });
 
 // Функция для одобрения анкеты
 async function approveApplication(id) {
     try {
-        const applicationRef = doc(db, "applications", id); // Получение ссылки на документ анкеты
+        const applicationRef = doc(db, "applications", id);
         await updateDoc(applicationRef, {
-            status: "approved" // Обновление статуса анкеты на "одобрено"
+            status: "approved"
         });
-        loadApplications();  // Перезагрузка анкет после одобрения
+        loadApplications();  // Перезагрузить анкеты после одобрения
     } catch (e) {
-        alert("Ошибка при одобрении анкеты: " + e.message); // Ошибка при одобрении анкеты
+        alert("Ошибка при одобрении анкеты: " + e.message);
     }
 }
 
 // Функция для удаления анкеты
 async function deleteApplication(id) {
     try {
-        await deleteDoc(doc(db, "applications", id)); // Удаление документа анкеты из Firestore
-        loadApplications();  // Перезагрузка анкет после удаления
+        await deleteDoc(doc(db, "applications", id));
+        loadApplications();  // Перезагрузить анкеты после удаления
     } catch (e) {
-        alert("Ошибка при удалении анкеты: " + e.message); // Ошибка при удалении анкеты
+        alert("Ошибка при удалении анкеты: " + e.message);
     }
 }
