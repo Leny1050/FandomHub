@@ -42,7 +42,7 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('addRuleContainer').style.display = 'none';
         document.getElementById('pendingContainer').style.display = 'none';
         document.getElementById('applicationsContainer').style.display = 'none';
-        document.getElementById('approvedContainer').style.display = 'none';
+        document.getElementById('approvedContainer').style.display = 'block';
         document.getElementById('loginButton').style.display = 'inline-block';
         document.getElementById('logoutButton').style.display = 'none';
     }
@@ -210,9 +210,9 @@ async function approveImage(id, url) {
 async function deleteImage(id, url) {
     if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
         try {
-            const storageRef = ref(storage, url);
-            await deleteObject(storageRef);
-            await deleteDoc(doc(db, "images", id));
+            const imageRef = ref(storage, url);
+            await deleteObject(imageRef);  // Удаление изображения из хранилища
+            await deleteDoc(doc(db, "images", id));  // Удаление записи из Firestore
             loadImages();  // Перезагрузить изображения после удаления
         } catch (e) {
             alert("Ошибка при удалении изображения: " + e.message);
@@ -253,6 +253,12 @@ async function loadApplications() {
             pendingApplicationsContainer.appendChild(applicationElement);
         } else if (status === "approved") {
             approvedApplicationsContainer.appendChild(applicationElement);
+            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Удалить";
+                deleteButton.onclick = () => deleteApplication(doc.id);
+                applicationElement.appendChild(deleteButton); // Добавить кнопку удаления только для админов
+            }
         }
     });
 }
@@ -286,4 +292,6 @@ async function deleteApplication(id) {
 loadRules();
 loadImages();
 loadApplications();
+
+
 
