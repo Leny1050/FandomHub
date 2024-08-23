@@ -81,6 +81,7 @@ async function loadRules() {
         ruleElement.classList.add('rule-item');
         ruleElement.textContent = rule;
 
+        // Проверка, если пользователь авторизован и имеет доступ
         if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Удалить";
@@ -213,23 +214,16 @@ async function loadApplications() {
         const applicationElement = document.createElement('div');
         applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
+        // Отображение одобренных анкет для всех пользователей
         if (status === "approved") {
             approvedApplicationsContainer.appendChild(applicationElement);
-
-            // Если текущий пользователь админ, добавляем кнопку удаления```javascript
-            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = "Удалить";
-                deleteButton.onclick = () => deleteApplication(doc.id);
-                applicationElement.appendChild(deleteButton);
-            }
         }
 
-        // Заявки на рассмотрении видны только админам
+        // Ожидающие анкеты видны только админам
         if (status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
-            approveButton.onclick = () => approveApplication(doc.id, role, fandom);
+            approveButton.onclick = () => approveApplication(doc.id);
 
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Удалить";
@@ -265,9 +259,7 @@ document.getElementById('applicationForm').addEventListener('submit', async (e) 
 async function approveApplication(id) {
     try {
         const applicationRef = doc(db, "applications", id);
-        await updateDoc(applicationRef, {
-            status: "approved"
-        });
+        await updateDoc(applicationRef, { status: "approved" });
         loadApplications();  // Перезагрузить анкеты после одобрения
     } catch (e) {
         alert("Ошибка при одобрении анкеты: " + e.message);
