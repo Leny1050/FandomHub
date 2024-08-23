@@ -199,12 +199,12 @@ async function deleteImage(id, url) {
     }
 }
 
-// Load applications from Firestore
+// Загрузка анкет из Firestore
 async function loadApplications() {
     const pendingApplicationsContainer = document.getElementById('pendingApplications');
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
-    pendingApplicationsContainer.innerHTML = ""; // Clear container for pending applications
-    approvedApplicationsContainer.innerHTML = ""; // Clear container for approved applications
+    pendingApplicationsContainer.innerHTML = ""; // Очистить контейнер для ожидающих анкет
+    approvedApplicationsContainer.innerHTML = ""; // Очистить контейнер для одобренных анкет
 
     const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
@@ -225,16 +225,18 @@ async function loadApplications() {
             applicationElement.appendChild(deleteButton);
             pendingApplicationsContainer.appendChild(applicationElement);
         } else if (status === "approved") {
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteApplication(doc.id);
-            applicationElement.appendChild(deleteButton);
+            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Удалить";
+                deleteButton.onclick = () => deleteApplication(doc.id);
+                applicationElement.appendChild(deleteButton);
+            }
             approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
 }
 
-// Submit an application
+// Отправка анкеты
 document.getElementById('applicationForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const role = document.getElementById('role').value.trim();
@@ -243,28 +245,28 @@ document.getElementById('applicationForm').addEventListener('submit', async (e) 
     try {
         await addDoc(collection(db, "applications"), { role, fandom, status: "pending" });
         alert("Ваша анкета отправлена и ожидает проверки.");
-        loadApplications(); // Reload applications after submission
+        loadApplications(); // Перезагрузить анкеты после отправки
     } catch (error) {
         alert("Ошибка при отправке анкеты: " + error.message);
     }
 });
 
-// Approve an application
+// Одобрение анкеты
 async function approveApplication(id) {
     try {
         const applicationRef = doc(db, "applications", id);
         await updateDoc(applicationRef, { status: "approved" });
-        loadApplications(); // Reload applications after approval
+        loadApplications(); // Перезагрузить анкеты после одобрения
     } catch (error) {
         alert("Ошибка при одобрении анкеты: " + error.message);
     }
 }
 
-// Delete an application
+// Удаление анкеты
 async function deleteApplication(id) {
     try {
         await deleteDoc(doc(db, "applications", id));
-        loadApplications(); // Reload applications after deletion
+        loadApplications(); // Перезагрузить анкеты после удаления
     } catch (error) {
         alert("Ошибка при удалении анкеты: " + error.message);
     }
