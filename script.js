@@ -174,36 +174,9 @@ document.getElementById('uploadImageButton').addEventListener('click', async () 
         const url = await getDownloadURL(storageRef);
         await addDoc(collection(db, "images"), { url: url, status: "pending" });
         alert("Изображение загружено и ожидает проверки.");
-        loadImages(); // Перезагрузить изображения после загрузки
-    } catch (error) {
-        alert("Ошибка при загрузке изображения: " + error.message);
-    }
-});
+        loadImages(); // Перезагрузить изображения
 
-// Одобрение изображения
-async function approveImage(id) {
-    try {
-        const imageRef = doc(db, "images", id);
-        await updateDoc(imageRef, { status: "approved" });
-        loadImages(); // Перезагрузить изображения после одобрения
-    } catch (error) {
-        alert("Ошибка при одобрении изображения: " + error.message);
-    }
-}
-
-// Удаление изображения
-async function deleteImage(id, url) {
-    try {
-        const storageRef = ref(storage, url);
-        await deleteObject(storageRef);
-        await deleteDoc(doc(db, "images", id)); // Исправлено
-        loadImages(); // Перезагрузить изображения после удаления
-    } catch (error) {
-        alert("Ошибка при удалении изображения: " + error.message);
-    }
-}
-
-// Функция для загрузки и управления анкетами
+    // Функция для загрузки и управления анкетами
 async function loadApplications() {
     const pendingApplicationsContainer = document.getElementById('pendingApplications');
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
@@ -267,6 +240,7 @@ async function loadOccupiedRoles() {
         rolesContainer.appendChild(roleElement);
     });
 }
+
 // Добавление новой роли
 document.getElementById('addRoleButton').addEventListener('click', addRole);
 async function addRole() {
