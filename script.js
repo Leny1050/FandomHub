@@ -34,6 +34,7 @@ onAuthStateChanged(auth, (user) => {
     loadRules();
     loadImages();
     loadApplications();
+    loadOccupiedRoles(); // Загружаем занятые роли
 });
 
 // Функция переключения интерфейса в зависимости от состояния аутентификации
@@ -43,6 +44,7 @@ function toggleUI(user) {
     document.getElementById('pendingContainer').style.display = isAuthenticated ? 'block' : 'none';
     document.getElementById('applicationsContainer').style.display = isAuthenticated ? 'block' : 'none';
     document.getElementById('approvedContainer').style.display = isAuthenticated ? 'block' : 'none';
+    document.getElementById('rolesContainer').style.display = (isAuthenticated && allowedEmails.includes(auth.currentUser.email)) ? 'block' : 'none'; // Отображение занятых ролей только для админов
     document.getElementById('loginButton').style.display = isAuthenticated ? 'none' : 'inline-block';
     document.getElementById('logoutButton').style.display = isAuthenticated ? 'inline-block' : 'none';
 }
@@ -194,7 +196,7 @@ async function deleteImage(id, url) {
     try {
         const storageRef = ref(storage, url);
         await deleteObject(storageRef);
-        await deleteDoc(doc(db, "images", id));
+        await deleteDoc(doc(db, "images, id));
         loadImages(); // Перезагрузить изображения после удаления
     } catch (error) {
         alert("Ошибка при удалении изображения: " + error.message);
@@ -275,11 +277,65 @@ async function deleteApplication(id) {
         alert("Ошибка при удалении анкеты: " + e.message);
     }
 }
+
+// Загрузка занятых ролей
+async function loadOccupiedRoles() {
+    const occupiedRolesContainer = document.getElementById('occupiedRoles');
+    occupiedRolesContainer.innerHTML = ""; // Очистить контейнер для занятых ролей
+
+    const querySnapshot = await getDocs(collection(db, "roles"));
+    querySnapshot.forEach((doc) => {
+        const { role } = doc.data();
+        const roleElement = document.createElement('li');
+        roleElement.textContent = role;
+
+        // Проверка, если пользователь авторизован и имеет доступ
+        if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.onclick = () => deleteRole(doc.id);
+            roleElement.appendChild(deleteButton);
+        }
+
+        occupiedRolesContainer.appendChild(roleElement);
+    });
+}
+
+// Добавление новой занятой роли
+document.getElementById('addRoleButton').addEventListener('click', addOccupiedRole);
+async function addOccupiedRole() {
+    const newRoleInput = document.getElementById('new-role');
+    const newRoleText = newRoleInput.value.trim();
+
+    if (newRoleText && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+        try {
+            await addDoc(collection(db, "roles"), { role: newRoleText });
+            newRoleInput.value = ""; // Очистить поле ввода
+            loadOccupiedRoles(); // Перезагрузить занятые роли
+        } catch (error) {
+            alert("Ошибка при добавлении занятой роли: " + error.message);
+        }
+    } else {
+        alert("Пожалуйста, войдите в систему с разрешенным адресом электронной почты для добавления занятой роли.");
+    }
+}
+
+// Удаление занятой роли
+async function deleteRole(id) {
+    try {
+        await deleteDoc(doc(db, "roles", id));
+        loadOccupiedRoles(); // Перезагрузить занятые роли после удаления
+    } catch (error) {
+        alert("Ошибка при удалении занятой роли: " + error.message);
+    }
+}
+
 // Функция для переключения между разделами
 function showSection(section) {
     document.getElementById('rulesContainer').style.display = 'none';
     document.getElementById('imagesContainer').style.display = 'none';
     document.getElementById('applicationsContainer').style.display = 'none';
+    document.getElementById('rolesContainer').style.display = 'none'; // Добавить скрытие контейнера занятых ролей
 
     if (section === 'rules') {
         document.getElementById('rulesContainer').style.display = 'block';
@@ -290,6 +346,9 @@ function showSection(section) {
     } else if (section === 'applications') {
         document.getElementById('applicationsContainer').style.display = 'block';
         loadApplications(); // Загружать анкеты при открытии раздела
+    } else if (section === 'roles') { // Добавить условие для отображения занятых ролей
+        document.getElementById('rolesContainer').style.display = 'block';
+        loadOccupiedRoles(); // Загружать занятые роли при открытии раздела
     }
 }
 
@@ -310,8 +369,9 @@ document.getElementById('applicationsLink').addEventListener('click', () => {
     showSection('applications');
 });
 
+document.getElementById('rolesLink').addEventListener('click', () => { // Добавить обработчик для перехода к занятым ролям
+    showSection('roles');
+});
+
 // Инициализируем отображение первой секции
 showSection('rules'); // Показывать правила по умолчанию при загрузке страницы
-
-
-
