@@ -264,3 +264,5 @@ async function loadApplications() {
     });
 }
 
+// Вызов начальной загрузки
+loadApplications();
