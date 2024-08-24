@@ -196,7 +196,7 @@ async function deleteImage(id, url) {
     try {
         const storageRef = ref(storage, url);
         await deleteObject(storageRef);
-        await deleteDoc(doc(db, "images, id));
+        await deleteDoc(doc(db, "images", id)); // Исправлено: добавлены правильные кавычки
         loadImages(); // Перезагрузить изображения после удаления
     } catch (error) {
         alert("Ошибка при удалении изображения: " + error.message);
