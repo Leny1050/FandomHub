@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Firebase конфигурация
 const firebaseConfig = {
@@ -18,7 +17,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-const storage = getStorage(app);
 
 // Массив с разрешенными адресами электронной почты
 const allowedEmails = [
@@ -37,22 +35,25 @@ onAuthStateChanged(auth, (user) => {
     const logoutButton = document.getElementById('logoutButton');
 
     if (user) {
-        if (addRuleContainer) addRuleContainer.style.display = 'block';
-        if (pendingContainer) pendingContainer.style.display = 'block';
-        if (applicationsContainer) applicationsContainer.style.display = 'block';
-        if (approvedContainer) approvedContainer.style.display = 'block';
-        if (loginButton) loginButton.style.display = 'none';
-        if (logoutButton) logoutButton.style.display = 'inline-block';
+        if (allowedEmails.includes(user.email)) {
+            addRuleContainer.style.display = 'block';  // Показываем возможность добавления правил
+        } else {
+            addRuleContainer.style.display = 'none';  // Скрываем, если пользователь не в списке
+        }
+        pendingContainer.style.display = 'block';
+        applicationsContainer.style.display = 'block';
+        approvedContainer.style.display = 'block';
+        loginButton.style.display = 'none';
+        logoutButton.style.display = 'inline-block';
     } else {
-        if (addRuleContainer) addRuleContainer.style.display = 'none';
-        if (pendingContainer) pendingContainer.style.display = 'none';
-        if (applicationsContainer) applicationsContainer.style.display = 'none';
-        if (approvedContainer) approvedContainer.style.display = 'none';
-        if (loginButton) loginButton.style.display = 'inline-block';
-        if (logoutButton) logoutButton.style.display = 'none';
+        addRuleContainer.style.display = 'none';
+        pendingContainer.style.display = 'none';
+        applicationsContainer.style.display = 'none';
+        approvedContainer.style.display = 'none';
+        loginButton.style.display = 'inline-block';
+        logoutButton.style.display = 'none';
     }
     loadRules();  // Загружаем правила при изменении статуса аутентификации
-    loadImages();  // Загружаем изображения при изменении статуса аутентификации
     loadApplications();  // Загружаем анкеты при изменении статуса аутентификации
 });
 
@@ -149,7 +150,7 @@ async function loadApplications() {
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
     if (!pendingApplicationsContainer || !approvedApplicationsContainer) return;  // Проверка на наличие контейнеров
     pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
-    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
+    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для одобренных анкет
 
     const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
