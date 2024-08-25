@@ -116,6 +116,8 @@ async function addRule() {
     if (!newRuleInput) return;  // Проверка на наличие элемента
     const newRuleText = newRuleInput.value.trim();
 
+    console.log("Добавляемое правило:", newRuleText); // Добавьте это логирование
+
     // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
     if (newRuleText && auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
         try {
@@ -131,6 +133,7 @@ async function addRule() {
         alert("Пожалуйста, войдите в систему с разрешенным адресом электронной почты для добавления правила.");
     }
 }
+
 document.getElementById('addRuleButton').addEventListener('click', addRule);
 
 async function deleteRule(id) {
