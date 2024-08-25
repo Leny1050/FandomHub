@@ -20,31 +20,51 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 
-// Массив с разрешенными адресами электронной почты
+// Массив с разрешенными адресами электронной почты (администраторами)
 const allowedEmails = [
     "wulk741852963@gmail.com",
     "101010tatata1010@gmail.com",
     "fludvsefd500@gmail.com"
 ];
 
-// Функция для обновления интерфейса на основе состояния аутентификации
-function updateUIBasedOnAuth(user) {
-    const adminVisible = user && allowedEmails.includes(user.email);
+// Функция для обновления интерфейса
+function updateUI(user) {
+    if (user) {
+        // Общий доступ
+        document.getElementById('addRuleContainer').style.display = 'block';
+        document.getElementById('pendingContainer').style.display = 'block';
+        document.getElementById('applicationsContainer').style.display = 'block';
+        document.getElementById('approvedContainer').style.display = 'block';
+        document.getElementById('loginButton').style.display = 'none';
+        document.getElementById('logoutButton').style.display = 'inline-block';
 
-    document.getElementById('addRuleContainer').style.display = adminVisible ? 'block' : 'none';
-    document.getElementById('pendingContainer').style.display = adminVisible ? 'block' : 'none';
-    document.getElementById('applicationsContainer').style.display = adminVisible ? 'block' : 'none';
-    document.getElementById('approvedContainer').style.display = adminVisible ? 'block' : 'none';
-    document.getElementById('loginButton').style.display = user ? 'none' : 'inline-block';
-    document.getElementById('logoutButton').style.display = user ? 'inline-block' : 'none';
+        // Административный доступ
+        if (allowedEmails.includes(user.email)) {
+            document.getElementById('adminControls').style.display = 'block';
+        } else {
+            document.getElementById('adminControls').style.display = 'none';
+        }
+    } else {
+        // Пользователь не авторизован
+        document.getElementById('addRuleContainer').style.display = 'none';
+        document.getElementById('pendingContainer').style.display = 'none';
+        document.getElementById('applicationsContainer').style.display = 'none';
+        document.getElementById('approvedContainer').style.display = 'none';
+        document.getElementById('loginButton').style.display = 'inline-block';
+        document.getElementById('logoutButton').style.display = 'none';
+        document.getElementById('adminControls').style.display = 'none';
+    }
 }
 
-// Функция для проверки состояния аутентификации
+// Проверка состояния аутентификации
 onAuthStateChanged(auth, (user) => {
-    updateUIBasedOnAuth(user);
-    loadRules();  // Загружаем правила при изменении статуса аутентификации
-    loadImages();  // Загружаем изображения при изменении статуса аутентификации
-    loadApplications();  // Загружаем анкеты при изменении статуса аутентификации
+    updateUI(user);  // Обновление интерфейса в зависимости от статуса пользователя
+
+    if (user) {
+        loadRules();  // Загружаем правила
+        loadImages();  // Загружаем изображения
+        loadApplications();  // Загружаем анкеты
+    }
 });
 
 // Вход пользователя
@@ -54,7 +74,7 @@ document.getElementById('loginButton').addEventListener('click', () => {
     signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
             alert("Вы успешно вошли в систему!");
-            updateUIBasedOnAuth(userCredential.user);  // Обновляем интерфейс для нового состояния
+            updateUI(userCredential.user);  // Обновление интерфейса после входа
         })
         .catch((error) => {
             alert("Ошибка при входе: " + error.message);
@@ -65,7 +85,7 @@ document.getElementById('loginButton').addEventListener('click', () => {
 document.getElementById('logoutButton').addEventListener('click', () => {
     signOut(auth).then(() => {
         alert("Вы вышли из системы.");
-        updateUIBasedOnAuth(null);  // Обновляем интерфейс после выхода
+        updateUI(null);  // Обновление интерфейса после выхода
     }).catch((error) => {
         alert("Ошибка при выходе: " + error.message);
     });
@@ -216,35 +236,25 @@ async function deleteImage(id, url) {
 
 // Функции для загрузки и управления анкетами
 async function loadApplications() {
-    const pendingContainer = document.getElementById('pendingApplications');
-    const approvedContainer = document.getElementById('approvedApplications');
-    pendingContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
-    approvedContainer.innerHTML = "";  // Очистить контейнер для одобренных анкет
+    const pendingApplicationsContainer = document.getElementById('pendingApplications');
+    const approvedApplicationsContainer = document.getElementById('approvedApplications');
+    pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
+    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
 
     const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
-        const applicationData = doc.data();
+        const application = doc.data();
+        const role = application.role;
+        const fandom = application.fandom;
+        const status = application.status;  // "pending" или "approved"
+
         const applicationElement = document.createElement('div');
+        applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
-        const nameElement = document.createElement('p');
-        nameElement.textContent = "Имя: " + applicationData.name;
-
-        const phoneElement = document.createElement('p');
-        phoneElement.textContent = "Телефон: " + applicationData.phone;
-
-        const statusElement = document.createElement('p');
-        statusElement.textContent = "Статус: " + applicationData.status;
-
-        applicationElement.appendChild(nameElement);
-        applicationElement.appendChild(phoneElement);
-        applicationElement.appendChild(statusElement);
-
-        if (applicationData.status === "approved") {
-            approvedContainer.appendChild(applicationElement);
-        } else if (applicationData.status === "pending" && auth.currentUser) {
+        if (status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
-            approveButton.onclick = () => approveApplication(doc.id);
+            approveButton.onclick = () => approveApplication(doc.id, role, fandom);
 
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Удалить";
@@ -252,34 +262,37 @@ async function loadApplications() {
 
             applicationElement.appendChild(approveButton);
             applicationElement.appendChild(deleteButton);
-            pendingContainer.appendChild(applicationElement);
+            pendingApplicationsContainer.appendChild(applicationElement);
+        } else if (status === "approved") {
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = "Удалить";
+            deleteButton.onclick = () => deleteApplication(doc.id);
+
+            applicationElement.appendChild(deleteButton);
+            approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
 }
 
-async function addApplication() {
-    const name = document.getElementById('applicationName').value;
-    const phone = document.getElementById('applicationPhone').value;
+document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const role = document.getElementById('role').value.trim();
+    const fandom = document.getElementById('fandom').value.trim();
 
-    if (name && phone) {
-        try {
-            await addDoc(collection(db, "applications"), {
-                name: name,
-                phone: phone,
-                status: "pending"
-            });
-            alert("Анкета добавлена и ожидает проверки.");
-            loadApplications();  // Перезагрузить анкеты после добавления
-        } catch (e) {
-            alert("Ошибка при добавлении анкеты: " + e.message);
-        }
-    } else {
-        alert("Пожалуйста, заполните все поля.");
+    try {
+        await addDoc(collection(db, "applications"), {
+            role: role,
+            fandom: fandom,
+            status: "pending"
+        });
+        alert("Ваша анкета отправлена и ожидает проверки.");
+        loadApplications();  // Перезагрузить анкеты после отправки
+    } catch (e) {
+        alert("Ошибка при отправке анкеты: " + e.message);
     }
-}
-document.getElementById('addApplicationButton').addEventListener('click', addApplication);
+});
 
-async function approveApplication(id) {
+async function approveApplication(id, role, fandom) {
     try {
         const applicationRef = doc(db, "applications", id);
         await updateDoc(applicationRef, {
