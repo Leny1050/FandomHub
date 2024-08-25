@@ -158,6 +158,7 @@ async function loadImages() {
         const imageId = doc.id; // Получаем идентификатор документа
 
         const imageElement = document.createElement('div');
+        imageElement.id = `image-${imageId}`; // Уникальный идентификатор для контейнера
         const img = document.createElement('img');
         img.src = imageUrl;
         imageElement.appendChild(img);
@@ -165,7 +166,7 @@ async function loadImages() {
         if (status === "approved") {
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteImage(imageId, imageUrl);
+            deleteButton.onclick = () => deleteImage(imageId, imageUrl, imageElement); // Передаем элемент
             imageElement.appendChild(deleteButton);  // Добавляем кнопку удаления
             approvedImagesContainer.appendChild(imageElement);
         } else if (status === "pending" && auth.currentUser) {
@@ -175,7 +176,7 @@ async function loadImages() {
 
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteImage(imageId, imageUrl);
+            deleteButton.onclick = () => deleteImage(imageId, imageUrl, imageElement); // Передаем элемент
 
             imageElement.appendChild(approveButton);
             imageElement.appendChild(deleteButton);
@@ -218,7 +219,7 @@ async function approveImage(id, url) {
     }
 }
 
-async function deleteImage(id, url) {
+async function deleteImage(id, url, imageElement) {
     try {
         const storageRef = ref(storage, url);
         // Проверка существования изображения перед удалением
@@ -227,15 +228,21 @@ async function deleteImage(id, url) {
         // Если файл существует, удалить его
         await deleteObject(storageRef);
         await deleteDoc(doc(db, "images", id));
-        loadImages();  // Перезагрузить изображения после удаления
+        
+        // Удаляем элемент из DOM сразу после успешного удаления
+        if (imageElement) {
+            imageElement.remove();  // Удаление контейнера изображения из DOM
+        }
+
+        // Перезагрузка изображений (можно не выполнять, так как элемент уже удален)
+        // loadImages(); 
     } catch (e) {
+        console.error("Ошибка при удалении изображения:", e);
         if (e.code === 'storage/object-not-found') {
             alert("Ошибка: Файл не найден. Возможно, он уже удален.");
         } else {
             alert("Ошибка при удалении изображения: " + e.message);
         }
-        // Перезагрузить изображения, чтобы очистить контейнеры
-        loadImages();
     }
 }
 
