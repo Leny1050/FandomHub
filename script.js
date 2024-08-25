@@ -144,6 +144,25 @@ async function deleteRule(id) {
 }
 
 // Функции для загрузки и управления изображениями
+let currentId = null; // Идентификатор будет загружен из Firestore
+
+async function loadCurrentId() {
+    const configRef = doc(db, "config", "imageId"); // Обращаемся к документу с идентификатором
+    const docSnapshot = await getDoc(configRef);
+
+    if (docSnapshot.exists()) {
+        currentId = docSnapshot.data().lastImageId; // Загружаем последний идентификатор
+    } else {
+        currentId = 0; // Если документа нет, начинаем с 0
+        await setDoc(configRef, { lastImageId: currentId }); // Создаем документ
+    }
+}
+
+async function updateCurrentId() {
+    const configRef = doc(db, "config", "imageId");
+    await updateDoc(configRef, { lastImageId: currentId }); // Обновляем идентификатор в Firestore
+}
+
 async function loadImages() {
     const approvedImagesContainer = document.getElementById('approvedImages');
     const pendingImagesContainer = document.getElementById('pendingImages');
@@ -158,7 +177,7 @@ async function loadImages() {
         const imageId = doc.id; // Получаем идентификатор документа
 
         const imageElement = document.createElement('div');
-        imageElement.id = `image-${imageId}`; // Уникальный идентификатор для контейнера
+        imageElement.id = `image-${doc.data().uniqueId}`; // Используем уникальный идентификатор
         const img = document.createElement('img');
         img.src = imageUrl;
         imageElement.appendChild(img);
@@ -195,11 +214,16 @@ document.getElementById('uploadImageButton').addEventListener('click', async () 
     try {
         await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
-        // Создание документа с уникальным идентификатором в Firestore
+        
+        // Присваиваем уникальный идентификатор и увеличиваем его
+        const uniqueId = currentId++;
         await addDoc(collection(db, "images"), {
             url: url,
-            status: "pending"
+            status: "pending",
+            uniqueId: uniqueId  // Присваиваем уникальный идентификатор
         });
+
+        await updateCurrentId(); // Обновляем идентификатор в Firestore
         alert("Изображение загружено и ожидает проверки.");
         loadImages();  // Перезагрузить изображения после загрузки
     } catch (e) {
@@ -233,9 +257,6 @@ async function deleteImage(id, url, imageElement) {
         if (imageElement) {
             imageElement.remove();  // Удаление контейнера изображения из DOM
         }
-
-        // Перезагрузка изображений (можно не выполнять, так как элемент уже удален)
-        // loadImages(); 
     } catch (e) {
         console.error("Ошибка при удалении изображения:", e);
         if (e.code === 'storage/object-not-found') {
@@ -245,6 +266,9 @@ async function deleteImage(id, url, imageElement) {
         }
     }
 }
+
+// Загружаем текущий идентификатор при инициализации приложения
+loadCurrentId().then(loadImages);
 
 // Функции для загрузки и управления анкетами
 async function loadApplications() {
