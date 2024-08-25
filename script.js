@@ -232,8 +232,11 @@ async function deleteImage(id, url) {
         } else {
             alert("Ошибка при удалении изображения: " + e.message);
         }
+        // Перезагрузить изображения, чтобы очистить контейнеры
+        loadImages();
     }
 }
+
 
 // Функции для загрузки и управления анкетами
 async function loadApplications() {
