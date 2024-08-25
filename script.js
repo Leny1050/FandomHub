@@ -30,21 +30,27 @@ const allowedEmails = [
 // Функция для проверки состояния аутентификации
 onAuthStateChanged(auth, (user) => {
     const addRuleContainer = document.getElementById('addRuleContainer');
+    const pendingContainer = document.getElementById('pendingContainer');
+    const applicationsContainer = document.getElementById('applicationsContainer');
+    const approvedContainer = document.getElementById('approvedContainer');
     const loginButton = document.getElementById('loginButton');
     const logoutButton = document.getElementById('logoutButton');
 
     if (user) {
-        // Показываем элементы для авторизованных пользователей
         if (addRuleContainer) addRuleContainer.style.display = 'block';
+        if (pendingContainer) pendingContainer.style.display = 'block';
+        if (applicationsContainer) applicationsContainer.style.display = 'block';
+        if (approvedContainer) approvedContainer.style.display = 'block';
         if (loginButton) loginButton.style.display = 'none';
         if (logoutButton) logoutButton.style.display = 'inline-block';
     } else {
-        // Скрываем элементы для неавторизованных пользователей
         if (addRuleContainer) addRuleContainer.style.display = 'none';
+        if (pendingContainer) pendingContainer.style.display = 'none';
+        if (applicationsContainer) applicationsContainer.style.display = 'none';
+        if (approvedContainer) approvedContainer.style.display = 'none';
         if (loginButton) loginButton.style.display = 'inline-block';
         if (logoutButton) logoutButton.style.display = 'none';
     }
-
     loadRules();  // Загружаем правила при изменении статуса аутентификации
     loadApplications();  // Загружаем анкеты при изменении статуса аутентификации
 });
@@ -88,26 +94,15 @@ async function loadRules() {
         const ruleText = document.createElement('p');
         ruleText.textContent = rule;
 
-        // Проверка, является ли текущий пользователь авторизованным и имеет ли он права
+        // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
         if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
-            const editButtonsContainer = document.createElement('div');
-            editButtonsContainer.classList.add('edit-buttons');
-
-            const editButton = document.createElement('button');
-            editButton.textContent = "Изменить";
-            editButton.classList.add('edit-button');
-            editButton.onclick = () => editRule(doc.id);
-
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Удалить";
             deleteButton.classList.add('delete-button');
             deleteButton.onclick = () => deleteRule(doc.id);
 
-            editButtonsContainer.appendChild(editButton);
-            editButtonsContainer.appendChild(deleteButton);
-
             ruleElement.appendChild(ruleText);
-            ruleElement.appendChild(editButtonsContainer);
+            ruleElement.appendChild(deleteButton);
         } else {
             ruleElement.appendChild(ruleText);
         }
@@ -144,21 +139,6 @@ async function deleteRule(id) {
         loadRules();  // Перезагрузить правила после удаления
     } catch (e) {
         alert("Ошибка при удалении правила: " + e.message);
-    }
-}
-
-async function editRule(id) {
-    const newRuleText = prompt("Введите новое правило:");
-    if (newRuleText) {
-        try {
-            const ruleRef = doc(db, "rules", id);
-            await updateDoc(ruleRef, {
-                text: newRuleText
-            });
-            loadRules();  // Перезагрузить правила после изменения
-        } catch (e) {
-            alert("Ошибка при изменении правила: " + e.message);
-        }
     }
 }
 
