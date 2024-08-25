@@ -218,12 +218,20 @@ async function approveImage(id, url) {
 
 async function deleteImage(id, url) {
     try {
+        // Проверка существования изображения перед удалением
         const storageRef = ref(storage, url);
+        await getDownloadURL(storageRef); // Это выбросит ошибку, если файл не существует
+
+        // Если файл существует, удалить его
         await deleteObject(storageRef);
         await deleteDoc(doc(db, "images", id));
         loadImages();  // Перезагрузить изображения после удаления
     } catch (e) {
-        alert("Ошибка при удалении изображения: " + e.message);
+        if (e.code === 'storage/object-not-found') {
+            alert("Ошибка: Файл не найден. Возможно, он уже удален.");
+        } else {
+            alert("Ошибка при удалении изображения: " + e.message);
+        }
     }
 }
 
