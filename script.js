@@ -28,9 +28,6 @@ const allowedEmails = [
 // Функция для проверки состояния аутентификации
 onAuthStateChanged(auth, (user) => {
     const addRuleContainer = document.getElementById('addRuleContainer');
-    const pendingContainer = document.getElementById('pendingContainer');
-    const applicationsContainer = document.getElementById('applicationsContainer');
-    const approvedContainer = document.getElementById('approvedContainer');
     const loginButton = document.getElementById('loginButton');
     const logoutButton = document.getElementById('logoutButton');
 
@@ -40,16 +37,10 @@ onAuthStateChanged(auth, (user) => {
         } else {
             addRuleContainer.style.display = 'none';  // Скрываем, если пользователь не в списке
         }
-        pendingContainer.style.display = 'block';
-        applicationsContainer.style.display = 'block';
-        approvedContainer.style.display = 'block';
         loginButton.style.display = 'none';
         logoutButton.style.display = 'inline-block';
     } else {
         addRuleContainer.style.display = 'none';
-        pendingContainer.style.display = 'none';
-        applicationsContainer.style.display = 'none';
-        approvedContainer.style.display = 'none';
         loginButton.style.display = 'inline-block';
         logoutButton.style.display = 'none';
     }
@@ -84,8 +75,7 @@ document.getElementById('logoutButton').addEventListener('click', () => {
 // Функции для загрузки и управления правилами
 async function loadRules() {
     const querySnapshot = await getDocs(collection(db, "rules"));
-    const rulesContainer = document.getElementById('rules');
-    if (!rulesContainer) return;  // Проверка на наличие элемента
+    const rulesContainer = document.getElementById('rulesList');
     rulesContainer.innerHTML = "";  // Очистить контейнер
 
     querySnapshot.forEach((doc) => {
@@ -115,7 +105,6 @@ async function loadRules() {
 
 async function addRule() {
     const newRuleInput = document.getElementById('new-rule');
-    if (!newRuleInput) return;  // Проверка на наличие элемента
     const newRuleText = newRuleInput.value.trim();
 
     // Проверка, является ли текущий пользователь авторизованным и есть ли у него права
@@ -148,9 +137,8 @@ async function deleteRule(id) {
 async function loadApplications() {
     const pendingApplicationsContainer = document.getElementById('pendingApplications');
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
-    if (!pendingApplicationsContainer || !approvedApplicationsContainer) return;  // Проверка на наличие контейнеров
-    pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
-    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для одобренных анкет
+    pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер
+    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер
 
     const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
