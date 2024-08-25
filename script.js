@@ -151,7 +151,7 @@ async function loadApplications() {
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
     if (!pendingApplicationsContainer || !approvedApplicationsContainer) return;  // Проверка на наличие контейнеров
     pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
-    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для одобренных анкет
+    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для одобренных ролей
 
     const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
@@ -163,6 +163,7 @@ async function loadApplications() {
         const applicationElement = document.createElement('div');
         applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
+        // Отображаем ожидающие анкеты только для авторизованных пользователей
         if (status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
@@ -175,15 +176,17 @@ async function loadApplications() {
             applicationElement.appendChild(approveButton);
             applicationElement.appendChild(deleteButton);
             pendingApplicationsContainer.appendChild(applicationElement);
-        } else if (status === "approved") {
-            // Добавление кнопки удаления только для авторизованных пользователей
+        }
+        // Одобренные анкеты видны всем
+        else if (status === "approved") {
+            // Кнопка удаления видима только для авторизованных пользователей
             if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = "Удалить";
                 deleteButton.onclick = () => deleteApplication(doc.id);
-
                 applicationElement.appendChild(deleteButton);
             }
+
             approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
