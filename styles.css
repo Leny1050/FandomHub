@@ -153,22 +153,22 @@ footer {
 
 /* Секция для изображений */
 .image-container {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
 }
 
 .image-container div {
     position: relative;
-    width: 400px; /* Размеры блока изображения */
-    height: 400px;
+    width: 100%;
+    height: 300px;
     overflow: hidden;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
     transition: transform 0.3s;
     display: flex;
-    flex-direction: column; /* Вертикальная ориентация для кнопок */
-    justify-content: flex-end; /* Снизу по вертикали */
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
 .image-container img {
@@ -179,24 +179,24 @@ footer {
 }
 
 .image-container .button-container {
-    display: flex; /* Гибкая компоновка для кнопок */
-    justify-content: space-between; /* Пространство между кнопками */
-    margin-top: 5px; /* Отступ между изображением и кнопками */
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
 }
 
 .image-container button {
-    flex: 1; /* Каждая кнопка занимает равное пространство */
+    flex: 1;
     padding: 5px;
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-right: 10px; /* Отступ между кнопками */
+    margin-right: 10px;
 }
 
 .image-container button:last-child {
-    margin-right: 0; /* Убираем отступ для последней кнопки */
+    margin-right: 0;
 }
 
 /* Секция для анкет */
@@ -225,6 +225,11 @@ footer {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    flex-wrap: wrap;
+}
+
+.applications-container div div {
+    flex: 1 1 100%;
 }
 
 .applications-container button {
