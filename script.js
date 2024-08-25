@@ -155,6 +155,7 @@ async function loadImages() {
     querySnapshot.forEach((doc) => {
         const imageUrl = doc.data().url;
         const status = doc.data().status;  // "approved" или "pending"
+        const imageId = doc.id; // Получаем идентификатор документа
 
         const imageElement = document.createElement('div');
         const img = document.createElement('img');
@@ -164,17 +165,17 @@ async function loadImages() {
         if (status === "approved") {
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteImage(doc.id, imageUrl);
+            deleteButton.onclick = () => deleteImage(imageId, imageUrl);
             imageElement.appendChild(deleteButton);  // Добавляем кнопку удаления
             approvedImagesContainer.appendChild(imageElement);
         } else if (status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
-            approveButton.onclick = () => approveImage(doc.id, imageUrl);
+            approveButton.onclick = () => approveImage(imageId, imageUrl);
 
             const deleteButton = document.createElement('button');
             deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteImage(doc.id, imageUrl);
+            deleteButton.onclick = () => deleteImage(imageId, imageUrl);
 
             imageElement.appendChild(approveButton);
             imageElement.appendChild(deleteButton);
@@ -193,6 +194,7 @@ document.getElementById('uploadImageButton').addEventListener('click', async () 
     try {
         await uploadBytes(storageRef, file);
         const url = await getDownloadURL(storageRef);
+        // Создание документа с уникальным идентификатором в Firestore
         await addDoc(collection(db, "images"), {
             url: url,
             status: "pending"
@@ -218,8 +220,8 @@ async function approveImage(id, url) {
 
 async function deleteImage(id, url) {
     try {
-        // Проверка существования изображения перед удалением
         const storageRef = ref(storage, url);
+        // Проверка существования изображения перед удалением
         await getDownloadURL(storageRef); // Это выбросит ошибку, если файл не существует
 
         // Если файл существует, удалить его
@@ -236,7 +238,6 @@ async function deleteImage(id, url) {
         loadImages();
     }
 }
-
 
 // Функции для загрузки и управления анкетами
 async function loadApplications() {
