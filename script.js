@@ -151,7 +151,7 @@ async function loadApplications() {
     const approvedApplicationsContainer = document.getElementById('approvedApplications');
     if (!pendingApplicationsContainer || !approvedApplicationsContainer) return;  // Проверка на наличие контейнеров
     pendingApplicationsContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
-    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для занятых ролей
+    approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для одобренных анкет
 
     const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
@@ -176,11 +176,14 @@ async function loadApplications() {
             applicationElement.appendChild(deleteButton);
             pendingApplicationsContainer.appendChild(applicationElement);
         } else if (status === "approved") {
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = "Удалить";
-            deleteButton.onclick = () => deleteApplication(doc.id);
+            // Добавление кнопки удаления только для авторизованных пользователей
+            if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Удалить";
+                deleteButton.onclick = () => deleteApplication(doc.id);
 
-            applicationElement.appendChild(deleteButton);
+                applicationElement.appendChild(deleteButton);
+            }
             approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
