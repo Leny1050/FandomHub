@@ -154,8 +154,11 @@ async function loadApplications() {
     approvedApplicationsContainer.innerHTML = "";  // Очистить контейнер для одобренных ролей
 
     const querySnapshot = await getDocs(collection(db, "applications"));
+    console.log("Получены документы:", querySnapshot.size);  // Логирование размера полученных данных
+
     querySnapshot.forEach((doc) => {
         const application = doc.data();
+        console.log("Документ:", doc.id, "Данные:", application);  // Логирование каждого документа
         const role = application.role;
         const fandom = application.fandom;
         const status = application.status;  // "pending" или "approved"
@@ -163,7 +166,6 @@ async function loadApplications() {
         const applicationElement = document.createElement('div');
         applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
 
-        // Отображаем ожидающие анкеты только для авторизованных пользователей
         if (status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
@@ -177,9 +179,7 @@ async function loadApplications() {
             applicationElement.appendChild(deleteButton);
             pendingApplicationsContainer.appendChild(applicationElement);
         }
-        // Одобренные анкеты видны всем
         else if (status === "approved") {
-            // Кнопка удаления видима только для авторизованных пользователей
             if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = "Удалить";
@@ -187,6 +187,7 @@ async function loadApplications() {
                 applicationElement.appendChild(deleteButton);
             }
 
+            console.log("Добавляем одобренную заявку:", role, fandom);  // Логирование добавления одобренной заявки
             approvedApplicationsContainer.appendChild(applicationElement);
         }
     });
