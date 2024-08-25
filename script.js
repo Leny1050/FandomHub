@@ -30,7 +30,7 @@ const allowedEmails = [
 // Функция для проверки состояния аутентификации
 onAuthStateChanged(auth, (user) => {
     const addRuleContainer = document.getElementById('addRuleContainer');
-    const pendingContainer = document.getElementById('pendingContainer');
+    const pendingContainer = document.getElementById('pendingApplications');
     const applicationsContainer = document.getElementById('applicationsContainer');
     const approvedContainer = document.getElementById('approvedContainer');
     const loginButton = document.getElementById('loginButton');
@@ -82,7 +82,7 @@ document.getElementById('logoutButton').addEventListener('click', () => {
 // Функции для загрузки и управления правилами
 async function loadRules() {
     const querySnapshot = await getDocs(collection(db, "rules"));
-    const rulesContainer = document.getElementById('rules');
+    const rulesContainer = document.getElementById('rulesList');
     if (!rulesContainer) return;  // Проверка на наличие элемента
     rulesContainer.innerHTML = "";  // Очистить контейнер
 
