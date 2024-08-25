@@ -27,56 +27,48 @@ const allowedEmails = [
     "fludvsefd500@gmail.com"
 ];
 
-// Функция для обновления интерфейса
-function updateUI(user) {
-    if (user) {
-        document.getElementById('addRuleContainer').style.display = 'block';
-        document.getElementById('pendingContainer').style.display = 'block';
-        document.getElementById('applicationsContainer').style.display = 'block';
-        document.getElementById('approvedContainer').style.display = 'block';
-        document.getElementById('loginButton').style.display = 'none';
-        document.getElementById('logoutButton').style.display = 'inline-block';
+// Функция для обновления интерфейса на основе состояния аутентификации
+function updateUIBasedOnAuth(user) {
+    const adminVisible = user && allowedEmails.includes(user.email);
 
-        loadRules();
-        loadImages();
-        loadApplications();
-    } else {
-        document.getElementById('addRuleContainer').style.display = 'none';
-        document.getElementById('pendingContainer').style.display = 'none';
-        document.getElementById('applicationsContainer').style.display = 'none';
-        document.getElementById('approvedContainer').style.display = 'none';
-        document.getElementById('loginButton').style.display = 'inline-block';
-        document.getElementById('logoutButton').style.display = 'none';
-    }
+    document.getElementById('addRuleContainer').style.display = adminVisible ? 'block' : 'none';
+    document.getElementById('pendingContainer').style.display = adminVisible ? 'block' : 'none';
+    document.getElementById('applicationsContainer').style.display = adminVisible ? 'block' : 'none';
+    document.getElementById('approvedContainer').style.display = adminVisible ? 'block' : 'none';
+    document.getElementById('loginButton').style.display = user ? 'none' : 'inline-block';
+    document.getElementById('logoutButton').style.display = user ? 'inline-block' : 'none';
 }
 
-// Проверка состояния аутентификации и обновление интерфейса
+// Функция для проверки состояния аутентификации
 onAuthStateChanged(auth, (user) => {
-    updateUI(user);
+    updateUIBasedOnAuth(user);
+    loadRules();  // Загружаем правила при изменении статуса аутентификации
+    loadImages();  // Загружаем изображения при изменении статуса аутентификации
+    loadApplications();  // Загружаем анкеты при изменении статуса аутентификации
 });
 
 // Вход пользователя
-document.getElementById('loginButton').addEventListener('click', async () => {
+document.getElementById('loginButton').addEventListener('click', () => {
     const email = prompt("Введите ваш email:");
     const password = prompt("Введите ваш пароль:");
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-        alert("Вы успешно вошли в систему!");
-        updateUI(auth.currentUser);  // Обновление интерфейса после входа
-    } catch (error) {
-        alert("Ошибка при входе: " + error.message);
-    }
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            alert("Вы успешно вошли в систему!");
+            updateUIBasedOnAuth(userCredential.user);  // Обновляем интерфейс для нового состояния
+        })
+        .catch((error) => {
+            alert("Ошибка при входе: " + error.message);
+        });
 });
 
 // Выход пользователя
-document.getElementById('logoutButton').addEventListener('click', async () => {
-    try {
-        await signOut(auth);
+document.getElementById('logoutButton').addEventListener('click', () => {
+    signOut(auth).then(() => {
         alert("Вы вышли из системы.");
-        updateUI(null);  // Обновление интерфейса после выхода
-    } catch (error) {
+        updateUIBasedOnAuth(null);  // Обновляем интерфейс после выхода
+    }).catch((error) => {
         alert("Ошибка при выходе: " + error.message);
-    }
+    });
 });
 
 // Функции для загрузки и управления правилами
@@ -222,25 +214,34 @@ async function deleteImage(id, url) {
     }
 }
 
-// Функции для загрузки и управления заявками
+// Функции для загрузки и управления анкетами
 async function loadApplications() {
-    const applicationsContainer = document.getElementById('applications');
+    const pendingContainer = document.getElementById('pendingApplications');
     const approvedContainer = document.getElementById('approvedApplications');
-    applicationsContainer.innerHTML = "";  // Очистить контейнер для заявок
-    approvedContainer.innerHTML = "";  // Очистить контейнер для одобренных заявок
+    pendingContainer.innerHTML = "";  // Очистить контейнер для ожидающих анкет
+    approvedContainer.innerHTML = "";  // Очистить контейнер для одобренных анкет
 
     const querySnapshot = await getDocs(collection(db, "applications"));
     querySnapshot.forEach((doc) => {
-        const application = doc.data();
+        const applicationData = doc.data();
         const applicationElement = document.createElement('div');
-        applicationElement.classList.add('application-item');
 
-        const applicationText = document.createElement('p');
-        applicationText.textContent = `Заявка от ${application.name}: ${application.details}`;
+        const nameElement = document.createElement('p');
+        nameElement.textContent = "Имя: " + applicationData.name;
 
-        if (application.status === "approved") {
+        const phoneElement = document.createElement('p');
+        phoneElement.textContent = "Телефон: " + applicationData.phone;
+
+        const statusElement = document.createElement('p');
+        statusElement.textContent = "Статус: " + applicationData.status;
+
+        applicationElement.appendChild(nameElement);
+        applicationElement.appendChild(phoneElement);
+        applicationElement.appendChild(statusElement);
+
+        if (applicationData.status === "approved") {
             approvedContainer.appendChild(applicationElement);
-        } else if (application.status === "pending" && auth.currentUser) {
+        } else if (applicationData.status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
             approveButton.textContent = "Одобрить";
             approveButton.onclick = () => approveApplication(doc.id);
@@ -249,14 +250,34 @@ async function loadApplications() {
             deleteButton.textContent = "Удалить";
             deleteButton.onclick = () => deleteApplication(doc.id);
 
-            applicationElement.appendChild(applicationText);
             applicationElement.appendChild(approveButton);
             applicationElement.appendChild(deleteButton);
-
-            applicationsContainer.appendChild(applicationElement);
+            pendingContainer.appendChild(applicationElement);
         }
     });
 }
+
+async function addApplication() {
+    const name = document.getElementById('applicationName').value;
+    const phone = document.getElementById('applicationPhone').value;
+
+    if (name && phone) {
+        try {
+            await addDoc(collection(db, "applications"), {
+                name: name,
+                phone: phone,
+                status: "pending"
+            });
+            alert("Анкета добавлена и ожидает проверки.");
+            loadApplications();  // Перезагрузить анкеты после добавления
+        } catch (e) {
+            alert("Ошибка при добавлении анкеты: " + e.message);
+        }
+    } else {
+        alert("Пожалуйста, заполните все поля.");
+    }
+}
+document.getElementById('addApplicationButton').addEventListener('click', addApplication);
 
 async function approveApplication(id) {
     try {
@@ -264,17 +285,17 @@ async function approveApplication(id) {
         await updateDoc(applicationRef, {
             status: "approved"
         });
-        loadApplications();  // Перезагрузить заявки после одобрения
+        loadApplications();  // Перезагрузить анкеты после одобрения
     } catch (e) {
-        alert("Ошибка при одобрении заявки: " + e.message);
+        alert("Ошибка при одобрении анкеты: " + e.message);
     }
 }
 
 async function deleteApplication(id) {
     try {
         await deleteDoc(doc(db, "applications", id));
-        loadApplications();  // Перезагрузить заявки после удаления
+        loadApplications();  // Перезагрузить анкеты после удаления
     } catch (e) {
-        alert("Ошибка при удалении заявки: " + e.message);
+        alert("Ошибка при удалении анкеты: " + e.message);
     }
 }
