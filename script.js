@@ -36,6 +36,11 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('approvedContainer').style.display = 'block';
         document.getElementById('loginButton').style.display = 'none';
         document.getElementById('logoutButton').style.display = 'inline-block';
+
+        // Загружаем данные при успешном входе
+        loadRules();  
+        loadImages();  
+        loadApplications();  
     } else {
         document.getElementById('addRuleContainer').style.display = 'none';
         document.getElementById('pendingContainer').style.display = 'none';
@@ -44,9 +49,6 @@ onAuthStateChanged(auth, (user) => {
         document.getElementById('loginButton').style.display = 'inline-block';
         document.getElementById('logoutButton').style.display = 'none';
     }
-    loadRules();  // Загружаем правила при изменении статуса аутентификации
-    loadImages();  // Загружаем изображения при изменении статуса аутентификации
-    loadApplications();  // Загружаем анкеты при изменении статуса аутентификации
 });
 
 // Вход пользователя
@@ -54,8 +56,9 @@ document.getElementById('loginButton').addEventListener('click', () => {
     const email = prompt("Введите ваш email:");
     const password = prompt("Введите ваш пароль:");
     signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential) => {
+        .then(() => {
             alert("Вы успешно вошли в систему!");
+            // Обновление интерфейса происходит через onAuthStateChanged
         })
         .catch((error) => {
             alert("Ошибка при входе: " + error.message);
@@ -66,6 +69,7 @@ document.getElementById('loginButton').addEventListener('click', () => {
 document.getElementById('logoutButton').addEventListener('click', () => {
     signOut(auth).then(() => {
         alert("Вы вышли из системы.");
+        // Обновление интерфейса происходит через onAuthStateChanged
     }).catch((error) => {
         alert("Ошибка при выходе: " + error.message);
     });
