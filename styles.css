@@ -18,23 +18,27 @@ header {
     margin-bottom: 20px; /* Отступ снизу */
 }
 
-/* Градиентный заголовок */
+/* Градиентный заголовок с анимацией */
 h1 {
     font-size: 3rem; /* Увеличенный размер шрифта */
     margin: 0;
     background: linear-gradient(90deg, #bb86fc, #6200ea, #03dac6); /* Градиент */
     -webkit-background-clip: text; /* Подрезаем фон по тексту */
     -webkit-text-fill-color: transparent; /* Делаем текст прозрачным */
-    animation: fadeIn 1s ease-in-out;
+    animation: gradientAnimation 3s ease infinite; /* Анимация градиента */
     text-align: left; /* Выравнивание текста влево */
+    transform: translateX(20px); /* Сдвигаем заголовок вправо */
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0%;
     }
-    to {
-        opacity: 1;
+    50% {
+        background-position: 100%;
+    }
+    100% {
+        background-position: 0%;
     }
 }
 
@@ -255,29 +259,11 @@ nav li {
 nav a {
     color: #bb86fc; /* Светло-фиолетовый цвет текста ссылок */
     text-decoration: none; /* Убираем подчеркивание */
-    position: relative;
-    transition: color 0.3s;
-}
-
-nav a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    background: #6200ea; /* Фиолетовый цвет линии */
-    transition: width 0.3s, left 0.3s;
-    bottom: -5px; /* Расположение линии под текстом */
-    left: 50%; /* Выравнивание по центру */
-    transform: translateX(-50%); /* Центрируем линию */
+    position: relative; /* Для псевдоэлемента */
 }
 
 nav a:hover {
     color: #6200ea; /* Темный фиолетовый при наведении */
-}
-
-nav a:hover::after {
-    width: 100%;
-    left: 0;
 }
 
 /* Кнопки "Войти/Выйти" */
