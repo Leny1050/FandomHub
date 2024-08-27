@@ -18,6 +18,7 @@ header {
     position: relative;
 }
 
+/* Контент заголовка */
 .header-content {
     display: flex;
     justify-content: space-between;
@@ -34,7 +35,21 @@ h1 {
     background: linear-gradient(135deg, #bb86fc, #6200ea); /* Градиентный текст */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent; /* Прозрачный цвет текста для градиента */
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Нежная тень текста */
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8); /* Нежная тень текста для лучшей видимости */
+    animation: gradientAnimation 3s ease infinite; /* Анимация градиента */
+}
+
+/* Анимация градиента */
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 /* Параграфы */
@@ -236,10 +251,11 @@ nav a {
     text-decoration: none; /* Убираем подчеркивание */
     position: relative;
     padding: 5px; /* Добавлены отступы для улучшения кликабельности */
-    transition: color 0.3s, transform 0.3s;
+    transition: transform 0.2s; /* Плавная анимация */
 }
 
 nav a:hover {
     color: #6200ea; /* Темный фиолетовый при наведении */
-    transform: scale(1.05); /* Увеличение при наведении */
+    text-decoration: underline; /* Подчеркивание при наведении */
+    transform: scale(1.1); /* Увеличение при наведении */
 }
