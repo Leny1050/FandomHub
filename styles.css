@@ -27,25 +27,17 @@ header {
     padding: 0 20px;
 }
 
-/* Анимация заголовка */
+/* Заголовок */
 h1 {
-    font-size: 2.5rem;
+    font-size: 3rem; /* Увеличен размер шрифта */
     margin: 0;
-    background: linear-gradient(135deg, #bb86fc, #6200ea); /* Градиентный текст заголовка */
+    background: linear-gradient(135deg, #bb86fc, #6200ea); /* Градиентный текст */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent; /* Прозрачный цвет текста для градиента */
-    animation: fadeIn 1s ease-in-out;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Нежная тень текста */
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
+/* Параграфы */
 p {
     margin: 0;
 }
@@ -55,36 +47,18 @@ button {
     background-color: #6200ea; /* Фиолетовый цвет кнопок */
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 24px; /* Увеличены отступы */
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 8px; /* Более закругленные края */
     font-size: 1rem;
-    transition: background-color 0.3s, transform 0.2s;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
-}
-
-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 300%;
-    height: 300%;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transition: all 0.5s;
-    transform: translate(-50%, -50%) scale(0);
-}
-
-button:hover::after {
-    transform: translate(-50%, -50%) scale(1);
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 button:hover {
     background-color: #3700b3; /* Темный фиолетовый при наведении */
-    transform: scale(1.05);
+    transform: translateY(-2px); /* Подъем кнопки при наведении */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6); /* Более глубокая тень */
 }
 
 /* Секции */
@@ -99,7 +73,7 @@ section {
 
 /* Заголовки */
 h2 {
-    font-size: 1.8rem;
+    font-size: 2rem; /* Увеличен размер заголовков */
     margin-bottom: 15px;
     color: #bb86fc; /* Светло-фиолетовый цвет заголовков */
     border-bottom: 2px solid #6200ea; /* Подчеркивание */
@@ -126,7 +100,7 @@ input[type="file"]:focus,
 textarea:focus {
     outline: none;
     border-color: #bb86fc; /* Фиолетовая рамка при фокусе */
-    background-color: #2b2b2b; /* Темный фон при фокусе */
+    background-color: #292929; /* Темный фон при фокусе */
 }
 
 /* Футер */
@@ -178,7 +152,7 @@ footer {
 
 .delete-button:hover {
     background-color: #d32f2f; /* Темный красный при наведении */
-    transform: scale(1.05);
+    transform: scale(1.05); /* Увеличение при наведении */
 }
 
 .add-rule-container {
@@ -236,7 +210,7 @@ footer {
 
 .applications-container button:hover {
     background-color: #d32f2f; /* Темный красный при наведении */
-    transform: scale(1.05);
+    transform: scale(1.05); /* Увеличение при наведении */
 }
 
 /* Навигация */
@@ -261,25 +235,11 @@ nav a {
     color: #bb86fc; /* Светло-фиолетовый цвет текста ссылок */
     text-decoration: none; /* Убираем подчеркивание */
     position: relative;
-    transition: color 0.3s;
-}
-
-nav a::after {
-    content: '';
-    position: absolute;
-    width: 0;
-    height: 2px;
-    background: #6200ea; /* Фиолетовая линия под ссылкой */
-    left: 50%;
-    bottom: -5px;
-    transition: width 0.3s, left 0.3s;
-}
-
-nav a:hover::after {
-    width: 100%; /* Линия расширяется при наведении */
-    left: 0; /* Линия перемещается */
+    padding: 5px; /* Добавлены отступы для улучшения кликабельности */
+    transition: color 0.3s, transform 0.3s;
 }
 
 nav a:hover {
     color: #6200ea; /* Темный фиолетовый при наведении */
+    transform: scale(1.05); /* Увеличение при наведении */
 }
