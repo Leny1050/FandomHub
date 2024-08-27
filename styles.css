@@ -240,10 +240,15 @@ nav ul {
     margin: 0; 
     display: flex; 
     justify-content: center;
+    align-items: center; /* Центрируем элементы по вертикали */
 }
 
 nav li {
     margin-right: 25px; 
+}
+
+nav li:last-child {
+    margin-right: 0; /* Убираем правый отступ у последнего элемента */
 }
 
 nav a {
@@ -258,3 +263,23 @@ nav a:hover {
     text-decoration: underline;
     transition: color 0.3s ease;
 }
+
+/* Кнопка Войти/Выйти в навигации */
+.auth-button {
+    background: linear-gradient(45deg, #6200ea, #3700b3);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.auth-button:hover {
+    background: linear-gradient(45deg, #3700b3, #6200ea);
+    transform: translateY(-2px);
+}
+
+
