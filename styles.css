@@ -22,21 +22,18 @@ header {
 h1 {
     font-size: 2.5rem;
     margin: 0;
-    background: linear-gradient(90deg, #ff00c8, #6200ea, #00f5d4); /* Градиент */
-    -webkit-background-clip: text; /* Обрезка фона по тексту */
-    -webkit-text-fill-color: transparent; /* Прозрачный цвет текста */
-    animation: gradientAnimation 5s ease-in-out infinite; /* Анимация градиента */
+    background: linear-gradient(90deg, #bb86fc, #6200ea, #03dac6); /* Градиент */
+    -webkit-background-clip: text; /* Подрезаем фон по тексту */
+    -webkit-text-fill-color: transparent; /* Делаем текст прозрачным */
+    animation: fadeIn 1s ease-in-out;
 }
 
-@keyframes gradientAnimation {
-    0% {
-        background-position: 0% 50%;
+@keyframes fadeIn {
+    from {
+        opacity: 0;
     }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
+    to {
+        opacity: 1;
     }
 }
 
@@ -269,12 +266,11 @@ nav a::after {
     transition: width 0.3s, left 0.3s;
 }
 
+nav a:hover {
+    color: #6200ea; /* Темный фиолетовый при наведении */
+}
+
 nav a:hover::after {
     width: 100%;
     left: 0;
-}
-
-nav a:hover {
-    color: #6200ea; /* Темный фиолетовый при наведении */
-    text-decoration: none; /* Убираем подчеркивание при наведении */
 }
