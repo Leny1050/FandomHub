@@ -1,45 +1,38 @@
 /* Общие стили */
 body {
-    font-family: 'Arial', sans-serif; /* Простая и современная шрифт */
-    background-color: #181818; /* Темный фон */
+    font-family: 'Roboto', sans-serif; /* Более современный и изящный шрифт */
+    background: linear-gradient(to bottom, #1c1c1c, #181818); /* Градиент для фона */
     margin: 0;
     padding: 0;
-    color: #f0f0f0; /* Светлый текст */
-    line-height: 1.6;
+    color: #f5f5f5; /* Светлый текст */
+    line-height: 1.8;
+    transition: all 0.3s ease;
 }
 
-/* Заголовок */
 header {
-    background-color: #242424; /* Темный фон заголовка */
+    background: linear-gradient(135deg, #333, #242424); /* Градиент для заголовка */
     color: #ffffff;
-    padding: 40px 20px; /* Увеличенные отступы */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
-    position: relative;
-    margin-bottom: 20px; /* Отступ снизу */
+    padding: 30px 0;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+    border-bottom: 2px solid #6200ea;
 }
 
-/* Градиентный заголовок с анимацией */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
 h1 {
-    font-size: 3rem; /* Увеличенный размер шрифта */
+    font-size: 3rem;
     margin: 0;
-    background: linear-gradient(90deg, #bb86fc, #6200ea, #03dac6); /* Градиент */
-    -webkit-background-clip: text; /* Подрезаем фон по тексту */
-    -webkit-text-fill-color: transparent; /* Делаем текст прозрачным */
-    animation: gradientAnimation 3s ease infinite; /* Анимация градиента */
-    text-align: left; /* Выравнивание текста влево */
-    transform: translateX(20px); /* Сдвигаем заголовок вправо */
-}
-
-@keyframes gradientAnimation {
-    0% {
-        background-position: 0%;
-    }
-    50% {
-        background-position: 100%;
-    }
-    100% {
-        background-position: 0%;
-    }
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #bb86fc;
 }
 
 p {
@@ -48,98 +41,88 @@ p {
 
 /* Кнопки */
 button {
-    background-color: #6200ea; /* Фиолетовый цвет кнопок */
+    background: linear-gradient(45deg, #6200ea, #3700b3); /* Градиент для кнопок */
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 24px;
     cursor: pointer;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: background-color 0.3s, transform 0.2s;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    transition: background 0.3s, transform 0.2s;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-    position: relative;
-    overflow: hidden;
-}
-
-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 300%;
-    height: 300%;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transition: all 0.5s;
-    transform: translate(-50%, -50%) scale(0);
-}
-
-button:hover::after {
-    transform: translate(-50%, -50%) scale(1);
 }
 
 button:hover {
-    background-color: #3700b3; /* Темный фиолетовый при наведении */
-    transform: scale(1.05);
+    background: linear-gradient(45deg, #3700b3, #6200ea);
+    transform: translateY(-3px) scale(1.1);
 }
 
 /* Секции */
 section {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #2a2a2a; /* Темный фон для секций */
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background: rgba(42, 42, 42, 0.9); /* Полупрозрачный фон для секций */
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+    transition: all 0.3s ease;
+}
+
+section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
 }
 
 /* Заголовки */
 h2 {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-    color: #bb86fc; /* Светло-фиолетовый цвет заголовков */
-    border-bottom: 2px solid #6200ea; /* Подчеркивание */
-    padding-bottom: 10px;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #bb86fc; 
+    border-bottom: 3px solid #6200ea; 
+    padding-bottom: 15px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 /* Ввод данных */
 input[type="text"],
 input[type="file"],
 textarea {
-    width: calc(100% - 22px);
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #444; /* Темная рамка */
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: border-color 0.3s, background-color 0.3s;
-    background-color: #1c1c1c; /* Темный фон для ввода */
-    color: #e0e0e0; /* Светлый текст */
+    width: calc(100% - 30px);
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #555; 
+    border-radius: 8px;
+    font-size: 1.1rem;
+    transition: border-color 0.3s;
+    background-color: #262626; /* Темный фон для ввода */
+    color: #e0e0e0; 
 }
 
 input[type="text"]:focus,
 input[type="file"]:focus,
 textarea:focus {
     outline: none;
-    border-color: #bb86fc; /* Фиолетовая рамка при фокусе */
-    background-color: #2b2b2b; /* Темный фон при фокусе */
+    border-color: #bb86fc;
+    box-shadow: 0 0 10px rgba(187, 134, 252, 0.7);
 }
 
 /* Футер */
 footer {
-    background-color: #242424; /* Темный фон футера */
+    background: linear-gradient(135deg, #333, #242424);
     color: #ffffff;
     text-align: center;
-    padding: 15px 0;
+    padding: 20px 0;
     position: relative;
+    border-top: 2px solid #6200ea;
 }
 
 /* Секция с правилами */
 .rules-section {
-    background-color: #292929; /* Темный фон для правил */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+    background-color: rgba(41, 41, 41, 0.9);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
 }
 
 .rules {
@@ -148,14 +131,20 @@ footer {
 }
 
 .rule-item {
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: #3b3b3b; /* Темный фон для элемента правила */
-    border-radius: 5px;
+    margin-bottom: 15px;
+    padding: 15px;
+    background-color: #444; /* Более светлый фон для элемента правила */
+    border-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+
+.rule-item:hover {
+    background-color: #555;
+    transform: translateY(-3px);
 }
 
 .rule-item p {
@@ -164,120 +153,108 @@ footer {
 }
 
 .delete-button {
-    background-color: #f44336; /* Красная кнопка удаления */
+    background: linear-gradient(45deg, #f44336, #d32f2f); 
     border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 8px 15px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background 0.3s;
 }
 
 .delete-button:hover {
-    background-color: #d32f2f; /* Темный красный при наведении */
-    transform: scale(1.05);
+    background: linear-gradient(45deg, #d32f2f, #f44336);
 }
 
+/* Контейнер добавления правил */
 .add-rule-container {
-    margin-top: 20px;
-    background-color: #2a2a2a; /* Темный фон для контейнера добавления правил */
-    padding: 15px;
-    border-radius: 5px;
+    margin-top: 25px;
+    background-color: rgba(42, 42, 42, 0.9); 
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
 }
 
 /* Секция для анкет */
 .application-section {
-    margin-top: 30px;
+    margin-top: 40px;
 }
 
 .application-section form {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .applications-container {
-    background-color: #292929; /* Темный фон для анкет */
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
-    margin-bottom: 20px;
+    background-color: rgba(41, 41, 41, 0.9); 
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+    margin-bottom: 25px;
 }
 
 .applications-container div {
-    background-color: #3b3b3b; /* Темный фон для элемента анкеты */
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
+    background-color: #4a4a4a; 
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     flex-wrap: wrap;
+    transition: all 0.3s ease;
 }
 
-.applications-container div div {
-    flex: 1 1 100%;
+.applications-container div:hover {
+    background-color: #5a5a5a;
+    transform: translateY(-3px);
 }
 
 .applications-container button {
-    background-color: #f44336; /* Красная кнопка */
+    background: linear-gradient(45deg, #f44336, #d32f2f); 
     border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 8px 15px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: background 0.3s;
 }
 
 .applications-container button:first-child {
-    background-color: #6200ea; /* Фиолетовая кнопка */
+    background: linear-gradient(45deg, #6200ea, #3700b3);
 }
 
 .applications-container button:hover {
-    background-color: #d32f2f; /* Темный красный при наведении */
-    transform: scale(1.05);
+    background: linear-gradient(45deg, #d32f2f, #f44336);
 }
 
 /* Навигация */
 nav {
-    background-color: #242424; /* Темный фон навигации */
-    padding: 10px; /* Отступы */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
-    display: flex; /* Используем флекс для выравнивания элементов */
-    justify-content: space-between; /* Разделяем навигацию и кнопки */
-    align-items: center; /* Выравнивание по центру */
+    background: linear-gradient(135deg, #333, #242424); 
+    padding: 15px; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+    border-bottom: 2px solid #6200ea;
 }
 
 nav ul {
-    list-style: none; /* Убираем маркеры списка */
-    padding: 0; /* Убираем отступы */
-    margin: 0; /* Убираем внешние отступы */
-    display: flex; /* Используем флекс для горизонтального расположения элементов */
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+    display: flex; 
+    justify-content: center;
 }
 
 nav li {
-    margin-right: 20px; /* Отступы между элементами */
+    margin-right: 25px; 
 }
 
 nav a {
-    color: #bb86fc; /* Светло-фиолетовый цвет текста ссылок */
-    text-decoration: none; /* Убираем подчеркивание */
-    position: relative; /* Для псевдоэлемента */
+    color: #bb86fc;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
 }
 
 nav a:hover {
-    color: #6200ea; /* Темный фиолетовый при наведении */
-}
-
-/* Кнопки "Войти/Выйти" */
-.login-button {
-    background-color: #6200ea; /* Фиолетовая кнопка */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.login-button:hover {
-    background-color: #3700b3; /* Темный фиолетовый при наведении */
-    transform: scale(1.05);
+    color: #6200ea;
+    text-decoration: underline;
+    transition: color 0.3s ease;
 }
