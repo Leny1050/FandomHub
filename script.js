@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-storage.js";
 
 // Firebase конфигурация
 const firebaseConfig = {
@@ -26,6 +26,29 @@ const allowedEmails = [
     "101010tatata1010@gmail.com",
     "fludvsefd500@gmail.com"
 ];
+
+// Уровни геймификации
+const levelRequirements = [1, 3, 7, 14, 30, 60, 120, 365]; // В днях
+const levelMessages = [
+    "Уровень 1: Простой участник",
+    "Уровень 2: Участник 3 дней",
+    "Уровень 3: Участник недели",
+    "Уровень 4: Участник 2 недель",
+    "Уровень 5: Участник месяца",
+    "Уровень 6: Участник 2 месяцев",
+    "Уровень 7: Участник 4 месяцев",
+    "Уровень 8: Участник года",
+];
+
+// Функция для расчета уровня
+function calculateLevel(days) {
+    for (let i = levelRequirements.length - 1; i >= 0; i--) {
+        if (days >= levelRequirements[i]) {
+            return i + 1; // Уровень 1 основан на индексе 0
+        }
+    }
+    return 0; // Если не достигнуто ни одного уровня
+}
 
 // Функция для проверки состояния аутентификации
 onAuthStateChanged(auth, (user) => {
@@ -162,9 +185,21 @@ async function loadApplications() {
         const role = application.role;
         const fandom = application.fandom;
         const status = application.status;  // "pending" или "approved"
+        const joinDate = application.joinDate.toDate(); // Получаем дату присоединения
+
+        const currentDate = new Date();
+        const timeDiff = Math.ceil((currentDate - joinDate) / (1000 * 3600 * 24)); // Разница в днях
 
         const applicationElement = document.createElement('div');
         applicationElement.textContent = `Роль: ${role}, Фандом: ${fandom}`;
+
+        // Расчет уровня
+        const level = calculateLevel(timeDiff);
+        const levelMessage = level > 0 ? levelMessages[level - 1] : "У вас еще нет уровня";
+
+        const levelElement = document.createElement('p');
+        levelElement.textContent = levelMessage;
+        applicationElement.appendChild(levelElement);
 
         if (status === "pending" && auth.currentUser) {
             const approveButton = document.createElement('button');
@@ -178,8 +213,7 @@ async function loadApplications() {
             applicationElement.appendChild(approveButton);
             applicationElement.appendChild(deleteButton);
             pendingApplicationsContainer.appendChild(applicationElement);
-        }
-        else if (status === "approved") {
+        } else if (status === "approved") {
             if (auth.currentUser && allowedEmails.includes(auth.currentUser.email)) {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = "Удалить";
@@ -203,7 +237,8 @@ document.getElementById('applicationForm').addEventListener('submit', async (e) 
         await addDoc(collection(db, "applications"), {
             role: role.value.trim(),
             fandom: fandom.value.trim(),
-            status: "pending"
+            status: "pending",
+            joinDate: new Date() // Сохраняем текущую дату как дату присоединения
         });
         alert("Ваша анкета отправлена и ожидает проверки.");
         loadApplications();  // Перезагрузить анкеты после отправки
