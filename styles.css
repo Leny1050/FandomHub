@@ -12,20 +12,21 @@ body {
 header {
     background-color: #242424; /* Темный фон заголовка */
     color: #ffffff;
-    padding: 20px 0;
-    text-align: center;
+    padding: 40px 20px; /* Увеличенные отступы */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
     position: relative;
+    margin-bottom: 20px; /* Отступ снизу */
 }
 
 /* Градиентный заголовок */
 h1 {
-    font-size: 2.5rem;
+    font-size: 3rem; /* Увеличенный размер шрифта */
     margin: 0;
     background: linear-gradient(90deg, #bb86fc, #6200ea, #03dac6); /* Градиент */
     -webkit-background-clip: text; /* Подрезаем фон по тексту */
     -webkit-text-fill-color: transparent; /* Делаем текст прозрачным */
     animation: fadeIn 1s ease-in-out;
+    text-align: left; /* Выравнивание текста влево */
 }
 
 @keyframes fadeIn {
@@ -235,6 +236,9 @@ nav {
     background-color: #242424; /* Темный фон навигации */
     padding: 10px; /* Отступы */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+    display: flex; /* Используем флекс для выравнивания элементов */
+    justify-content: space-between; /* Разделяем навигацию и кнопки */
+    align-items: center; /* Выравнивание по центру */
 }
 
 nav ul {
@@ -260,10 +264,11 @@ nav a::after {
     position: absolute;
     width: 0;
     height: 2px;
-    background: #6200ea; /* Фиолетовая линия под ссылкой */
-    left: 50%;
-    bottom: -5px;
+    background: #6200ea; /* Фиолетовый цвет линии */
     transition: width 0.3s, left 0.3s;
+    bottom: -5px; /* Расположение линии под текстом */
+    left: 50%; /* Выравнивание по центру */
+    transform: translateX(-50%); /* Центрируем линию */
 }
 
 nav a:hover {
@@ -273,4 +278,20 @@ nav a:hover {
 nav a:hover::after {
     width: 100%;
     left: 0;
+}
+
+/* Кнопки "Войти/Выйти" */
+.login-button {
+    background-color: #6200ea; /* Фиолетовая кнопка */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.login-button:hover {
+    background-color: #3700b3; /* Темный фиолетовый при наведении */
+    transform: scale(1.05);
 }
